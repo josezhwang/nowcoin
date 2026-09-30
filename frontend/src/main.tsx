@@ -5,6 +5,7 @@ import '@/styles/base.css'
 import '@/styles/layout.css'
 import '@/styles/home.css'
 import '@/styles/pages.css'
+import '@/styles/effects.css'
 import App from '@/app/App'
 
 createRoot(document.getElementById('root')!).render(

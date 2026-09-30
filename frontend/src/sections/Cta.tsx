@@ -17,7 +17,7 @@ export function Cta() {
   return (
     <section className="section cta" id="download" aria-labelledby="cta-title">
       <div className="container">
-        <Reveal className="cta-panel">
+        <Reveal className="cta-panel edge-glow">
           <div className="ambient" aria-hidden />
           <div className="cta-copy">
             <span className="badge">

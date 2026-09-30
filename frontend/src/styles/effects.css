@@ -1,0 +1,469 @@
+/*
+ * Motion & light effects. Pointer-driven values (--mx/--my in px, --nx/--ny in
+ * -1…1) come from usePointerTracking(). Everything here is decorative and is
+ * disabled under prefers-reduced-motion.
+ */
+
+/* ---------- Border beam: a light travelling around an element's border ---------- */
+
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.beam {
+  position: relative;
+}
+
+.beam::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg,
+    transparent 262deg,
+    rgb(91 140 255 / 0) 270deg,
+    #8fa2ff 318deg,
+    #e39cf2 344deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: beam-spin 9s linear infinite;
+}
+
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* Static gradient hairline — the beam's look without animation, for secondary panels. */
+.edge-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgb(143 162 255 / 0.55),
+    transparent 30%,
+    transparent 70%,
+    rgb(227 156 242 / 0.45)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ---------- Spotlight cards: border + inner glow following the pointer ---------- */
+
+.spot {
+  position: relative;
+  isolation: isolate;
+}
+
+.spot::before,
+.spot::after {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+/* Bright ring on the border nearest the pointer. */
+.spot::before {
+  inset: -1px;
+  z-index: 2;
+  padding: 1px;
+  background: radial-gradient(
+    240px circle at var(--mx, -999px) var(--my, -999px),
+    rgb(143 162 255 / 0.95),
+    rgb(227 156 242 / 0.5) 35%,
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Soft wash inside the card, beneath its content. */
+.spot::after {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(380px circle at var(--mx, -999px) var(--my, -999px), var(--brand-soft), transparent 60%);
+}
+
+.spot:hover::before,
+.spot:hover::after {
+  opacity: 1;
+}
+
+/* ---------- Hero: aurora, interactive grid, pointer glow, 3D tilt ---------- */
+
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.aurora span {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  will-change: transform;
+  animation: aurora-drift 22s ease-in-out infinite alternate;
+}
+
+.aurora span:nth-child(1) {
+  left: -8%;
+  top: -30%;
+  background: radial-gradient(closest-side, rgb(79 107 255 / 0.55), transparent);
+}
+
+.aurora span:nth-child(2) {
+  left: 30%;
+  top: -40%;
+  background: radial-gradient(closest-side, rgb(168 85 247 / 0.45), transparent);
+  animation-duration: 28s;
+  animation-delay: -6s;
+}
+
+.aurora span:nth-child(3) {
+  right: -10%;
+  top: -25%;
+  background: radial-gradient(closest-side, rgb(236 72 153 / 0.3), transparent);
+  animation-duration: 25s;
+  animation-delay: -12s;
+}
+
+:root[data-theme='light'] .aurora {
+  opacity: 0.35;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(12%, 18%) scale(1.15);
+  }
+  100% {
+    transform: translate(-8%, 8%) scale(0.95);
+  }
+}
+
+/* Grid lines brighten in a circle around the pointer. */
+.hero-grid-glow,
+.hero-pointer-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+
+.hero-grid-glow {
+  background-image:
+    linear-gradient(rgb(var(--fg-rgb) / 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--fg-rgb) / 0.16) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), #000, transparent 70%);
+  -webkit-mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), #000, transparent 70%);
+}
+
+.hero-pointer-glow {
+  background: radial-gradient(
+    520px circle at var(--mx, -999px) var(--my, -999px),
+    rgb(109 93 252 / 0.14),
+    transparent 60%
+  );
+}
+
+.hero-frame:hover .hero-grid-glow,
+.hero-frame:hover .hero-pointer-glow {
+  opacity: 1;
+}
+
+.hero-visual-wrap {
+  perspective: 1400px;
+}
+
+.hero-tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* backdrop-filter is dropped inside 3D-transformed layers, so the hero's
+   floating widgets get a near-opaque surface instead of relying on blur. */
+.hero-frame .float {
+  background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+}
+
+/* Depth parallax: layers drift by different amounts with the pointer. */
+.hero-frame .dash {
+  translate: calc(var(--nx, 0) * -6px) calc(var(--ny, 0) * -4px);
+  transition: translate 0.6s var(--ease);
+}
+
+.hero-frame .float-qr {
+  translate: calc(var(--nx, 0) * 16px) calc(var(--ny, 0) * 12px);
+  transition: translate 0.6s var(--ease);
+}
+
+.hero-frame .float-price {
+  translate: calc(var(--nx, 0) * 22px) calc(var(--ny, 0) * 16px);
+  transition: translate 0.6s var(--ease);
+}
+
+.hero-frame .float-amount {
+  translate: calc(var(--nx, 0) * 12px) calc(var(--ny, 0) * 18px);
+  transition: translate 0.6s var(--ease);
+}
+
+/* Sheen that slowly sweeps across the gradient words of the headline. */
+.shimmer strong {
+  background-image: var(--shimmer-gradient);
+  background-size: 250% 100%;
+  animation: shimmer-text 7s linear infinite;
+}
+
+@keyframes shimmer-text {
+  to {
+    background-position: -250% 0;
+  }
+}
+
+/* ---------- Buttons: light sweep on hover ---------- */
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / 0.38) 50%, transparent 75%);
+  transform: translateX(-130%);
+  transition: transform 0.75s var(--ease);
+}
+
+.btn-primary:hover::after {
+  transform: translateX(130%);
+}
+
+/* ---------- Features: orbit rings around the centrepiece ---------- */
+
+.features-center {
+  position: relative;
+}
+
+.features-center .image-slot {
+  position: relative;
+  z-index: 1;
+}
+
+.orbits {
+  position: absolute;
+  inset: -6%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.orbits span {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border: 1px solid rgb(var(--fg-rgb) / 0.08);
+  border-radius: 50%;
+  animation: orbit-spin 26s linear infinite;
+}
+
+.orbits span:nth-child(2) {
+  inset: 12%;
+  border-style: dashed;
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.orbits span:nth-child(3) {
+  inset: 24%;
+  animation-duration: 12s;
+}
+
+/* A glowing "planet" riding each ring. */
+.orbits span::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow:
+    0 0 12px 2px var(--brand),
+    0 0 24px 6px var(--brand-soft);
+}
+
+.orbits span:nth-child(2)::after {
+  background: var(--pink);
+  box-shadow: 0 0 12px 2px var(--pink);
+}
+
+.orbits span:nth-child(3)::after {
+  background: var(--blue);
+  box-shadow: 0 0 12px 2px var(--blue);
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Showcase: auto-advance progress under the active tab ---------- */
+
+.tab-progress {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--brand-gradient);
+  transform-origin: left;
+  animation-name: tab-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes tab-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Navigation: sliding hover pill & scroll progress ---------- */
+
+.nav-link {
+  position: relative;
+  isolation: isolate;
+}
+
+.nav-hover {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: var(--surface-hover);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.nav-link:hover {
+  background: none;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  height: 2px;
+  background: var(--brand-gradient);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+/* ---------- Footer: spotlight-lit wordmark ---------- */
+
+.footer-wordmark {
+  position: relative;
+  margin-top: 16px;
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(88px, 21vw, 300px);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 0.78;
+  user-select: none;
+}
+
+.footer-wordmark span {
+  display: block;
+  padding-bottom: 0.04em;
+}
+
+.wm-base {
+  background: linear-gradient(180deg, rgb(var(--fg-rgb) / 0.09), rgb(var(--fg-rgb) / 0.01));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.wm-glow {
+  position: absolute;
+  inset: 0;
+  background: var(--shimmer-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  mask-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), #000, transparent 70%);
+  -webkit-mask-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), #000, transparent 70%);
+  transition: opacity 0.4s var(--ease);
+}
+
+.footer-wordmark:hover .wm-glow {
+  opacity: 1;
+}
+
+/* ---------- Reduced motion: keep the look, drop the movement ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .beam::after,
+  .aurora,
+  .orbits span::after {
+    display: none;
+  }
+
+  .hero-frame .dash,
+  .hero-frame .float-qr,
+  .hero-frame .float-price,
+  .hero-frame .float-amount {
+    translate: none;
+  }
+}

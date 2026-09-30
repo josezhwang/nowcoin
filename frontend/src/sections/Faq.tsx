@@ -1,11 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import type { HomeContent } from '@/api/types'
 
 export function Faq({ faqs }: { faqs: HomeContent['faqs'] }) {
   const [open, setOpen] = useState<number | null>(0)
+  const baseId = useId()
 
   return (
     <section className="section faq-section" id="faq">
@@ -32,24 +32,17 @@ export function Faq({ faqs }: { faqs: HomeContent['faqs'] }) {
                   type="button"
                   className="faq-q"
                   aria-expanded={isOpen}
+                  aria-controls={`${baseId}-a${i}`}
                   onClick={() => setOpen(isOpen ? null : i)}
                 >
                   {f.question}
                   <span className="faq-icon" aria-hidden />
                 </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      className="faq-a"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <p>{f.answer}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div className="faq-a" id={`${baseId}-a${i}`} role="region" aria-hidden={!isOpen}>
+                  <div>
+                    <p>{f.answer}</p>
+                  </div>
+                </div>
               </div>
             )
           })}

@@ -1,24 +1,45 @@
 import { ArrowRight, Star } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 import { ButtonLink } from '@/components/ui/Button'
+import { Counter } from '@/components/ui/Counter'
 import { ImageSlot } from '@/components/ui/ImageSlot'
 import { avatarPhoto, images } from '@/config/images'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroDashboard } from './HeroDashboard'
 
 const AVATARS = ['Amara Okafor', 'Jonas Weber', 'Priya Raman', 'Leo Martins']
 
 const rise = (delay: number) => ({
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: 18, filter: 'blur(6px)' },
+  animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
   transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as const },
 })
 
 export function Hero() {
+  const ref = useRef<HTMLElement>(null)
+  const reduced = useReducedMotion()
+
+  // The dashboard starts angled in 3D and settles flat as the page scrolls.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
+  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 })
+  const rotateX = useTransform(smooth, [0, 0.45], [12, 0])
+  const rotateY = useTransform(smooth, [0, 0.45], [-14, 0])
+  const y = useTransform(smooth, [0, 1], [0, -40])
+  const tilt = reduced ? undefined : { rotateX, rotateY, y }
+
   return (
-    <section className="hero" aria-labelledby="hero-title">
+    <section className="hero" aria-labelledby="hero-title" ref={ref}>
       <div className="container">
-        <div className="hero-frame">
+        <div className="hero-frame beam" data-pointer>
           <div className="ambient" aria-hidden />
+          <div className="aurora" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="hero-grid-glow" aria-hidden />
+          <div className="hero-pointer-glow" aria-hidden />
           {/* Optional 3D render behind the dashboard; hidden in production until added. */}
           <ImageSlot
             image={images.hero.art}
@@ -37,7 +58,7 @@ export function Hero() {
                 Nowcoin Card Singularity — now in metal
               </motion.span>
 
-              <motion.h1 id="hero-title" className="hero-title tone" {...rise(0.08)}>
+              <motion.h1 id="hero-title" className="hero-title tone shimmer" {...rise(0.08)}>
                 The safe and reliable way to <strong>spend, send and grow</strong> your crypto
               </motion.h1>
 
@@ -62,7 +83,10 @@ export function Hero() {
                   ))}
                 </div>
                 <div>
-                  <strong>2.4M+</strong> customers in 90+ countries
+                  <strong>
+                    <Counter value={2.4} decimals={1} suffix="M+" />
+                  </strong>{' '}
+                  customers in 90+ countries
                   <span className="rating">
                     <span className="stars" aria-hidden>
                       {Array.from({ length: 5 }, (_, i) => (
@@ -77,11 +101,13 @@ export function Hero() {
 
             <motion.div
               className="hero-visual-wrap"
-              initial={{ opacity: 0, y: 30, scale: 0.98 }}
+              initial={{ opacity: 0, y: 30, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <HeroDashboard />
+              <motion.div className="hero-tilt" style={tilt}>
+                <HeroDashboard />
+              </motion.div>
             </motion.div>
           </div>
         </div>

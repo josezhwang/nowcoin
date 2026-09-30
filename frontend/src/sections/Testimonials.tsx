@@ -22,7 +22,7 @@ export function Testimonials({ items }: { items: HomeContent['testimonials'] }) 
         <div className="quote-grid">
           {items.map((t, i) => (
             <Reveal key={t.name} delay={(i % 3) * 0.06} className={i === 0 ? 'quote-featured' : undefined}>
-              <figure className="quote card">
+              <figure className="quote card spot">
                 <Quote size={22} className="quote-mark" aria-hidden />
                 <span className="stars" aria-label="5 out of 5 stars">
                   {Array.from({ length: 5 }, (_, s) => (

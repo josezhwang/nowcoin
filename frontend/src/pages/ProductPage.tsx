@@ -89,7 +89,7 @@ export default function ProductPage() {
           <div className="detail-features">
             {product.features.map((f, i) => (
               <Reveal key={f.title} delay={i * 0.06}>
-                <article className="detail-feature card">
+                <article className="detail-feature card spot">
                   <span className="detail-num">0{i + 1}</span>
                   <h3>{f.title}</h3>
                   <p>{f.body}</p>
@@ -109,7 +109,7 @@ export default function ProductPage() {
                 <Link
                   key={p.slug}
                   to={`/products/${p.slug}`}
-                  className="related-card card card-hover"
+                  className="related-card card card-hover spot"
                   style={{ '--accent': p.accent } as CSSProperties}
                 >
                   <span className="mega-dot" style={{ background: p.accent }} />

@@ -191,6 +191,65 @@ function Hub({ position, index, reduced, color }: HubProps) {
   )
 }
 
+/** Deterministic pseudo-random in [0, 1) — keeps scene layout pure across renders. */
+const hash = (n: number) => {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+
+/** A faint shell of stars around the globe for depth. */
+function Stars({ count, color, opacity }: { count: number; color: string; opacity: number }) {
+  const geometry = useMemo(() => {
+    const positions = new Float32Array(count * 3)
+    const v = new THREE.Vector3()
+    for (let i = 0; i < count; i++) {
+      // Uniform direction on a sphere, pushed out to a random radius.
+      const z = hash(i) * 2 - 1
+      const t = hash(i + 0.5) * Math.PI * 2
+      const r = Math.sqrt(1 - z * z)
+      v.set(r * Math.cos(t), z, r * Math.sin(t)).multiplyScalar(4.5 + hash(i + 0.25) * 4)
+      positions.set([v.x, v.y, v.z], i * 3)
+    }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    return geo
+  }, [count])
+
+  return (
+    <points geometry={geometry}>
+      <pointsMaterial size={0.035} color={color} transparent opacity={opacity} sizeAttenuation depthWrite={false} />
+    </points>
+  )
+}
+
+/** A tilted orbit with a small satellite travelling around it. */
+function OrbitRing({ color, reduced }: { color: string; reduced: boolean }) {
+  const sat = useRef<THREE.Mesh>(null)
+  const radius = R * 1.32
+  const points = useMemo(
+    () =>
+      Array.from({ length: 129 }, (_, i) => {
+        const a = (i / 128) * Math.PI * 2
+        return new THREE.Vector3(Math.cos(a) * radius, 0, Math.sin(a) * radius)
+      }),
+    [radius],
+  )
+  useFrame(({ clock }) => {
+    if (!sat.current) return
+    const a = reduced ? 1 : clock.elapsedTime * 0.35
+    sat.current.position.set(Math.cos(a) * radius, 0, Math.sin(a) * radius)
+  })
+  return (
+    <group rotation={[1.18, 0.22, -0.32]}>
+      <Line points={points} color={color} lineWidth={1} transparent opacity={0.35} />
+      <mesh ref={sat}>
+        <sphereGeometry args={[0.045, 16, 16]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+    </group>
+  )
+}
+
 /** Dotted Earth with animated settlement routes between financial hubs. Drag to rotate. */
 export function GlobeScene({ reduced }: { reduced: boolean }) {
   const { palette, theme } = useTheme()
@@ -224,6 +283,8 @@ export function GlobeScene({ reduced }: { reduced: boolean }) {
         minPolarAngle={Math.PI * 0.25}
         maxPolarAngle={Math.PI * 0.75}
       />
+      <Stars count={700} color={palette.additive ? '#c9c4ff' : '#4f46e5'} opacity={palette.additive ? 0.55 : 0.35} />
+      <OrbitRing color={palette.globeArc} reduced={reduced} />
       {/* Initial orientation facing the viewer. */}
       <group rotation={[0.3, -1.75, 0]}>
         <mesh>

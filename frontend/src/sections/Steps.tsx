@@ -22,7 +22,7 @@ export function Steps({ steps }: { steps: HomeContent['steps'] }) {
         <ol className="steps-grid">
           {steps.map((s, i) => (
             <Reveal key={s.title} delay={i * 0.08}>
-              <li className="step card">
+              <li className="step card spot">
                 {images.steps[i] && <ImageSlot image={images.steps[i]!} radius="12px" className="step-media" />}
                 <span className="step-num">Step {i + 1}</span>
                 <h3>{s.title}</h3>

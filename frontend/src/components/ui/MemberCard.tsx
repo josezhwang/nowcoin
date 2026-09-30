@@ -8,7 +8,7 @@ const LINK_LABELS = { linkedin: 'LinkedIn', x: 'X', github: 'GitHub' } as const
 export function MemberCard({ member, showBio = true }: { member: TeamMember; showBio?: boolean }) {
   const links = Object.entries(member.links) as [keyof typeof LINK_LABELS, string | undefined][]
   return (
-    <article className="member card">
+    <article className="member card spot">
       <ImageSlot image={teamPhoto(member.slug, member.name)} radius="14px" className="member-photo" />
       <div className="member-body">
         <h3>{member.name}</h3>

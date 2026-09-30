@@ -75,7 +75,7 @@ export default function ContactPage() {
           <div className="contact-side">
             <ul className="channel-grid">
               {CHANNELS.map(({ icon: Icon, label, body, value, href }) => (
-                <li key={label} className="channel card">
+                <li key={label} className="channel card spot">
                   <span className="pillar-icon" aria-hidden>
                     <Icon size={18} strokeWidth={1.8} />
                   </span>

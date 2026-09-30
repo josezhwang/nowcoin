@@ -96,7 +96,7 @@ export default function CompanyPage() {
           <div className="values-grid">
             {VALUES.map(({ icon: Icon, title, body }, i) => (
               <Reveal key={title} delay={i * 0.06}>
-                <article className="value card">
+                <article className="value card spot">
                   <span className="pillar-icon" aria-hidden>
                     <Icon size={18} strokeWidth={1.8} />
                   </span>

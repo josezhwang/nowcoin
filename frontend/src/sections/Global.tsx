@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, Hand } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Counter } from '@/components/ui/Counter'
@@ -100,28 +100,24 @@ export function Global() {
               <small>Illustrative</small>
             </header>
             <ol>
-              <AnimatePresence initial={false} mode="popLayout">
-                {feed.map((t) => (
-                  <motion.li
-                    key={t.id}
-                    layout
-                    initial={{ opacity: 0, y: -12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <span className="feed-route">
-                      <span>{t.from}</span>
-                      <ArrowRight size={12} aria-hidden />
-                      <span>{t.to}</span>
-                    </span>
-                    <span className="feed-time">Settled in {t.seconds}s</span>
-                    <span className="feed-amount">
-                      {t.amount} {t.asset}
-                    </span>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
+              {feed.map((t) => (
+                <motion.li
+                  key={t.id}
+                  initial={{ opacity: 0, y: -12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <span className="feed-route">
+                    <span>{t.from}</span>
+                    <ArrowRight size={12} aria-hidden />
+                    <span>{t.to}</span>
+                  </span>
+                  <span className="feed-time">Settled in {t.seconds}s</span>
+                  <span className="feed-amount">
+                    {t.amount} {t.asset}
+                  </span>
+                </motion.li>
+              ))}
             </ol>
           </aside>
 

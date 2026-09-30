@@ -96,6 +96,11 @@ export function Footer() {
             </span>
           </div>
         </div>
+        {/* Oversized wordmark: faint by default, lit by a gradient spotlight under the pointer. */}
+        <div className="footer-wordmark" data-pointer aria-hidden>
+          <span className="wm-base">{site.shortName}</span>
+          <span className="wm-glow">{site.shortName}</span>
+        </div>
       </div>
     </footer>
   )

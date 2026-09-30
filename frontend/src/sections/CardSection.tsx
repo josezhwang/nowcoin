@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, Check, Hand } from 'lucide-react'
 import { lazy, Suspense, useState } from 'react'
 import { useCardTiers } from '@/api/queries'
@@ -51,38 +51,34 @@ export function CardSection() {
                   </button>
                 ))}
               </div>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={tier.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <dl className="tier-metrics">
-                    <div>
-                      <dt>Cashback</dt>
-                      <dd>{tier.cashback}</dd>
-                    </div>
-                    <div>
-                      <dt>Stake</dt>
-                      <dd>{tier.stake}</dd>
-                    </div>
-                    <div>
-                      <dt>Monthly fee</dt>
-                      <dd>{tier.monthlyFee}</dd>
-                    </div>
-                  </dl>
-                  <ul className="check-list">
-                    {tier.perks.map((p) => (
-                      <li key={p}>
-                        <Check size={16} aria-hidden /> {p}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </AnimatePresence>
+              <motion.div
+                key={tier.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <dl className="tier-metrics">
+                  <div>
+                    <dt>Cashback</dt>
+                    <dd>{tier.cashback}</dd>
+                  </div>
+                  <div>
+                    <dt>Stake</dt>
+                    <dd>{tier.stake}</dd>
+                  </div>
+                  <div>
+                    <dt>Monthly fee</dt>
+                    <dd>{tier.monthlyFee}</dd>
+                  </div>
+                </dl>
+                <ul className="check-list">
+                  {tier.perks.map((p) => (
+                    <li key={p}>
+                      <Check size={16} aria-hidden /> {p}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
 
               <ButtonLink to="/products/card">
                 Order your card <ArrowRight size={16} aria-hidden />

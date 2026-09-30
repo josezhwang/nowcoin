@@ -24,6 +24,8 @@
   --brand-soft: rgb(109 93 252 / 0.14);
   --brand-gradient: linear-gradient(95deg, #4f6bff 0%, #8b5cf6 100%);
   --text-gradient: linear-gradient(95deg, #8fa2ff 0%, #b69cff 45%, #e39cf2 100%);
+  /* Repeating version (same colour at both ends) for the animated sheen. */
+  --shimmer-gradient: linear-gradient(95deg, #8fa2ff 0%, #b69cff 25%, #e39cf2 50%, #b69cff 75%, #8fa2ff 100%);
 
   --blue: #5b8cff;
   --violet: #a78bfa;
@@ -91,6 +93,7 @@
   --brand-strong: #4a3ae0;
   --brand-soft: rgb(91 76 240 / 0.1);
   --text-gradient: linear-gradient(95deg, #3f56e8 0%, #7c3aed 50%, #c026d3 100%);
+  --shimmer-gradient: linear-gradient(95deg, #3f56e8 0%, #7c3aed 25%, #c026d3 50%, #7c3aed 75%, #3f56e8 100%);
 
   --blue: #3565e8;
   --violet: #7c3aed;

@@ -20,7 +20,7 @@ function ProductRow({ p, flip }: { p: Product; flip: boolean }) {
   return (
     <Reveal>
       <article
-        className={`product-row card${flip ? ' is-flipped' : ''}`}
+        className={`product-row card spot${flip ? ' is-flipped' : ''}`}
         style={{ '--accent': p.accent } as CSSProperties}
       >
         <div className="product-row-copy">

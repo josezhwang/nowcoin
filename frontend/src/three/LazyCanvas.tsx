@@ -2,7 +2,7 @@ import { Canvas, type CanvasProps } from '@react-three/fiber'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { GlowFallback } from '@/components/ui/CardFallback'
-import { supportsWebGL } from '@/lib/webgl'
+import { isSoftwareRenderer, supportsWebGL } from '@/lib/webgl'
 
 interface Props extends CanvasProps {
   className?: string
@@ -19,6 +19,7 @@ export function LazyCanvas({ className, fallback = <GlowFallback />, ...props }:
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
   const webgl = supportsWebGL()
+  const soft = webgl && isSoftwareRenderer()
 
   useEffect(() => {
     const el = ref.current
@@ -42,8 +43,8 @@ export function LazyCanvas({ className, fallback = <GlowFallback />, ...props }:
         : mounted && (
             <ErrorBoundary name="LazyCanvas" fallback={fallback}>
               <Canvas
-                dpr={[1, 1.75]}
-                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+                dpr={soft ? 1 : [1, 1.75]}
+                gl={{ antialias: !soft, alpha: true, powerPreference: 'high-performance' }}
                 frameloop={visible ? 'always' : 'never'}
                 {...props}
               />

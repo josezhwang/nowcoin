@@ -1863,7 +1863,18 @@
   transform: translate(-50%, -50%) rotate(0deg);
 }
 
+/* Expands with a grid-rows transition — no JS measuring, never gets stuck. */
 .faq-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease);
+}
+
+.faq.open .faq-a {
+  grid-template-rows: 1fr;
+}
+
+.faq-a > div {
   overflow: hidden;
 }
 
