@@ -1,0 +1,114 @@
+/*
+ * Design tokens. Dark is the default; [data-theme='light'] overrides colours only.
+ * `--fg-rgb` drives translucent overlays so hairlines and surfaces flip with the theme.
+ */
+:root {
+  /* Colour */
+  --fg-rgb: 255 255 255;
+  --bg: #07070b;
+  --bg-elevated: #0e0e15;
+  --bg-sunken: #040406;
+  --surface: rgb(var(--fg-rgb) / 0.03);
+  --surface-hover: rgb(var(--fg-rgb) / 0.055);
+  --border: rgb(var(--fg-rgb) / 0.08);
+  --border-strong: rgb(var(--fg-rgb) / 0.14);
+  --text: #f4f4f7;
+  --text-secondary: #b4b4c6;
+  --muted: #8a8aa0;
+  --faint: #5f5f74;
+  --on-inverse: #07070b;
+  --inverse: #f4f4f7;
+
+  --brand: #6d5dfc;
+  --brand-strong: #5b4cf0;
+  --brand-soft: rgb(109 93 252 / 0.14);
+  --brand-gradient: linear-gradient(95deg, #4f6bff 0%, #8b5cf6 100%);
+  --text-gradient: linear-gradient(95deg, #8fa2ff 0%, #b69cff 45%, #e39cf2 100%);
+
+  --blue: #5b8cff;
+  --violet: #a78bfa;
+  --pink: #f0abfc;
+  --green: #34d399;
+  --orange: #fb923c;
+  --up: #34d399;
+  --down: #fb7185;
+
+  --nav-bg: rgb(12 12 18 / 0.72);
+  --popover-bg: rgb(16 16 24 / 0.98);
+  --glass: linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.02));
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 40px 80px -30px rgb(0 0 0 / 0.75);
+  --ambient-1: rgb(79 107 255 / 0.28);
+  --ambient-2: rgb(168 85 247 / 0.22);
+  --ambient-3: rgb(236 72 153 / 0.14);
+
+  /* Type */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --fs-display: clamp(2.4rem, 1.5rem + 2.6vw, 3.9rem);
+  --fs-h1: clamp(2.4rem, 1.6rem + 3vw, 4rem);
+  --fs-h2: clamp(2rem, 1.4rem + 2.2vw, 3.2rem);
+  --fs-h3: clamp(1.15rem, 1rem + 0.4vw, 1.35rem);
+  --fs-lead: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.78rem;
+
+  /* Space & shape */
+  --container: 1240px;
+  --gutter: clamp(20px, 4vw, 40px);
+  --section-y: clamp(88px, 11vw, 144px);
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --fg-rgb: 16 14 40;
+  --bg: #f7f7fb;
+  --bg-elevated: #ffffff;
+  --bg-sunken: #eeeef6;
+  --surface: rgb(255 255 255 / 0.75);
+  --surface-hover: #ffffff;
+  --border: rgb(var(--fg-rgb) / 0.09);
+  --border-strong: rgb(var(--fg-rgb) / 0.16);
+  --text: #0f0e1f;
+  --text-secondary: #3d3c55;
+  --muted: #5d5c75;
+  --faint: #8b8aa3;
+  --on-inverse: #ffffff;
+  --inverse: #0f0e1f;
+
+  --brand: #5b4cf0;
+  --brand-strong: #4a3ae0;
+  --brand-soft: rgb(91 76 240 / 0.1);
+  --text-gradient: linear-gradient(95deg, #3f56e8 0%, #7c3aed 50%, #c026d3 100%);
+
+  --blue: #3565e8;
+  --violet: #7c3aed;
+  --pink: #c026d3;
+  --green: #059669;
+  --orange: #ea580c;
+  --up: #059669;
+  --down: #e11d48;
+
+  --nav-bg: rgb(255 255 255 / 0.78);
+  --popover-bg: rgb(255 255 255 / 0.98);
+  --glass: linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.65));
+  --shadow-sm: 0 1px 2px rgb(16 14 40 / 0.06);
+  --shadow-md: 0 12px 32px -14px rgb(16 14 40 / 0.18);
+  --shadow-lg: 0 40px 80px -36px rgb(16 14 40 / 0.28);
+  --ambient-1: rgb(79 107 255 / 0.16);
+  --ambient-2: rgb(168 85 247 / 0.12);
+  --ambient-3: rgb(236 72 153 / 0.08);
+
+  color-scheme: light;
+}

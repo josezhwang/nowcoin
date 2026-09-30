@@ -1,0 +1,21 @@
+{
+  "name": "nowcoin-digital",
+  "private": true,
+  "description": "Nowcoin Digital company website \u2014 React frontend and NestJS API",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "setup": "npm install && npm ci --prefix backend && npm ci --prefix frontend",
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm run start:dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "test": "npm test --prefix backend && npm run test:e2e --prefix backend && npm test --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "typecheck": "npm run typecheck --prefix backend && npm run typecheck --prefix frontend",
+    "format": "npm run format --prefix backend && npm run format --prefix frontend",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
