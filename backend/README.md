@@ -1,6 +1,6 @@
 # Nowcoin Digital — backend
 
-NestJS 12 API (ESM, strict TypeScript) serving site content, live market prices and lead capture.
+NestJS 12 API (ESM, strict TypeScript; built with plain `tsc`, no Nest CLI needed) serving site content, live market prices and lead capture.
 
 | Command              | What it does                         |
 | -------------------- | ------------------------------------ |

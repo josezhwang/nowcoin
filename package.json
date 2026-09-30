@@ -1,9 +1,9 @@
 {
   "name": "nowcoin-digital",
   "private": true,
-  "description": "Nowcoin Digital company website — React frontend and NestJS API",
+  "description": "Nowcoin Digital company website \u2014 React frontend and NestJS API",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "scripts": {
     "setup": "npm install && npm ci --prefix backend && npm ci --prefix frontend",

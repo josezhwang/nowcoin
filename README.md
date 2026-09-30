@@ -9,7 +9,7 @@ backend/    NestJS 12 API — site content, live market prices, contact & newsle
 
 ## Run locally
 
-Requires Node 22+ (see `.nvmrc`).
+Requires Node 22.12 or newer (tested on 22.14 and 24; see `.nvmrc`).
 
 ```bash
 npm run setup   # install root, backend and frontend dependencies
