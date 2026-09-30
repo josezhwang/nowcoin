@@ -1,0 +1,468 @@
+/* ---------- Shared 3D world ---------- */
+
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+main,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Preloader ---------- */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 48px;
+  background:
+    radial-gradient(60% 50% at 50% 45%, rgba(109, 40, 217, 0.35), transparent 70%),
+    var(--bg);
+}
+
+.coin3d {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  transform-style: preserve-3d;
+  animation: coin-spin 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.coin3d-layer,
+.coin3d-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.coin3d-layer {
+  background: linear-gradient(135deg, #7c3aed, #0891b2);
+}
+
+.coin3d-face {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 54px;
+  color: rgba(255, 255, 255, 0.95);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55), transparent 45%),
+    linear-gradient(135deg, #a78bfa, #22d3ee);
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.25);
+  backface-visibility: hidden;
+}
+
+.coin3d-face.front {
+  transform: translateZ(6px);
+}
+
+.coin3d-face.back {
+  transform: rotateY(180deg) translateZ(6px);
+}
+
+@keyframes coin-spin {
+  from {
+    transform: rotateX(12deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(12deg) rotateY(360deg);
+  }
+}
+
+.preloader-meta {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.preloader-brand {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.preloader-count {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Custom cursor ---------- */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 150;
+  pointer-events: none;
+  display: none;
+}
+
+.has-cursor .cursor-dot,
+.has-cursor .cursor-ring {
+  display: block;
+}
+
+.has-cursor,
+.has-cursor * {
+  cursor: none !important;
+}
+
+.has-cursor input,
+.has-cursor textarea {
+  cursor: text !important;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 12px var(--lime);
+}
+
+.cursor-dot.is-text {
+  opacity: 0;
+}
+
+.cursor-ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+}
+
+/* Scale the inner span, not the ring, so the JS transform stays untouched. */
+.cursor-ring span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  font-family: var(--font-mono);
+  font-size: 0;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #07070d;
+  transition:
+    transform 0.35s var(--ease),
+    background 0.3s,
+    border-color 0.3s,
+    font-size 0.2s;
+}
+
+.cursor-ring.is-hover span {
+  transform: scale(1.6);
+  border-color: var(--lime);
+  background: rgba(198, 246, 91, 0.08);
+}
+
+.cursor-ring.is-label span {
+  transform: scale(2.2);
+  background: var(--lime);
+  border-color: var(--lime);
+  font-size: 5px;
+  font-weight: 500;
+}
+
+.cursor-ring.is-text span {
+  transform: scale(0.4);
+  opacity: 0;
+}
+
+.cursor-ring.is-down span {
+  transform: scale(0.85);
+}
+
+/* ---------- 3D tilt cards ---------- */
+
+.tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+  transition:
+    transform 0.6s var(--ease),
+    border-color 0.4s,
+    box-shadow 0.4s;
+  will-change: transform;
+}
+
+.tilt.is-tilting {
+  transition:
+    transform 0.12s linear,
+    border-color 0.4s,
+    box-shadow 0.4s;
+  box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--accent, #8b5cf6) 60%, transparent);
+}
+
+/* Specular glare that follows the cursor across the tilted surface. */
+.tilt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.12), transparent 60%);
+}
+
+.tilt.is-tilting::after {
+  opacity: 1;
+}
+
+.bento-tile.tilt:hover {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+}
+
+/* ---------- Kinetic band ---------- */
+
+.kinetic {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(40px, 8vw, 100px) 0;
+  perspective: 900px;
+}
+
+.kinetic-inner {
+  transform: rotateX(18deg) rotateZ(-4deg);
+  transform-style: preserve-3d;
+}
+
+.kb-row {
+  display: flex;
+  width: max-content;
+  gap: 0;
+}
+
+.kb-word {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 44px);
+  padding-right: clamp(20px, 3vw, 44px);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(56px, 10vw, 150px);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kb-word.outline {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.03));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.kb-word i {
+  font-style: normal;
+  font-size: 0.4em;
+  color: var(--lime);
+  -webkit-text-fill-color: var(--lime);
+}
+
+/* ---------- Card anatomy (pinned) ---------- */
+
+.anatomy {
+  position: relative;
+  height: 340vh;
+}
+
+.anatomy-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.anatomy-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.anatomy-copy h2 {
+  font-size: clamp(34px, 5vw, 64px);
+  margin: 18px 0 36px;
+}
+
+.anatomy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.anatomy-list li {
+  display: flex;
+  gap: 18px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  opacity: 0.35;
+  transform: translateX(0);
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease),
+    background 0.5s,
+    border-color 0.5s;
+}
+
+.anatomy-list li.past {
+  opacity: 0.6;
+}
+
+.anatomy-list li.active {
+  opacity: 1;
+  transform: translateX(10px);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+
+.anatomy-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--lime);
+  padding-top: 4px;
+}
+
+.anatomy-list h3 {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.anatomy-list p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.anatomy-progress {
+  margin-top: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.anatomy-progress span {
+  display: block;
+  height: 100%;
+  background: var(--grad);
+}
+
+.anatomy-canvas {
+  height: min(78svh, 720px);
+}
+
+@media (max-width: 900px) {
+  .anatomy {
+    height: 300vh;
+  }
+
+  .anatomy-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .anatomy-canvas {
+    order: -1;
+    height: 38svh;
+  }
+
+  .anatomy-copy h2 {
+    margin: 12px 0 16px;
+  }
+
+  .anatomy-list li {
+    padding: 10px 12px;
+  }
+
+  .anatomy-list li:not(.active) p {
+    display: none;
+  }
+}
+
+/* ---------- Network globe ---------- */
+
+.network-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.network-facts {
+  display: grid;
+  gap: 4px;
+}
+
+.network-fact {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+}
+
+.network-fact strong {
+  min-width: 3.4em;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.network-fact span {
+  color: var(--muted);
+}
+
+.globe-canvas {
+  height: clamp(420px, 50vw, 680px);
+}
+
+@media (max-width: 900px) {
+  .network-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .globe-canvas {
+    order: -1;
+    height: 380px;
+  }
+}
+
+/* ---------- CTA coin rain ---------- */
+
+.cta-coins {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cta-panel h2,
+.cta-panel > p {
+  text-shadow: 0 4px 30px rgba(5, 5, 10, 0.8);
+}
