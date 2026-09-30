@@ -33,6 +33,12 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+<<<<<<< Updated upstream
+=======
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/mau": "^0.0.6",
+    "@nestjs/schematics": "^12.0.0",
+>>>>>>> Stashed changes
     "@nestjs/testing": "^12.0.1",
     "@types/express": "^5.0.0",
     "@types/node": "^24.0.0",
