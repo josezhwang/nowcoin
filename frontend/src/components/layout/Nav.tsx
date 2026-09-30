@@ -1,25 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useApi } from '../lib/api'
-import type { Product } from '../lib/types'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useId, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useProducts } from '@/api/queries'
+import { navLinks } from '@/config/site'
 import { Logo } from './Logo'
-import { MagneticButton } from './MagneticButton'
-
-const LINKS = [
-  { label: 'Card', to: '/#card' },
-  { label: 'Business', to: '/products/pay' },
-  { label: 'Developers', to: '/#developers' },
-  { label: 'Company', to: '/company' },
-]
+import { ThemeToggle } from './ThemeToggle'
+import { MagneticButton } from '@/components/ui/MagneticButton'
 
 export function Nav() {
-  const { data: products } = useApi<Product[]>('/products')
+  const { data: products } = useProducts()
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [megaOpen, setMegaOpen] = useState(false)
   const location = useLocation()
+  const megaId = useId()
 
   useEffect(() => {
     let last = window.scrollY
@@ -42,8 +38,20 @@ export function Nav() {
   }
 
   useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setMegaOpen(false)
+      setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
   }, [menuOpen])
+
+  const navClass = ({ isActive }: { isActive: boolean }) => `nav-link${isActive ? ' is-active' : ''}`
 
   return (
     <header className={`nav${scrolled ? ' is-scrolled' : ''}${hidden && !menuOpen ? ' is-hidden' : ''}`}>
@@ -53,15 +61,18 @@ export function Nav() {
         <nav className="nav-links" aria-label="Primary">
           <div className="nav-item" onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)}>
             <button
+              type="button"
               className="nav-link"
               aria-expanded={megaOpen}
+              aria-controls={megaId}
               onClick={() => setMegaOpen((o) => !o)}
             >
-              Products <span className={`chev${megaOpen ? ' open' : ''}`}>⌄</span>
+              Products <ChevronDown size={14} className={`chev${megaOpen ? ' open' : ''}`} aria-hidden />
             </button>
             <AnimatePresence>
               {megaOpen && products && (
                 <motion.div
+                  id={megaId}
                   className="mega glass"
                   initial={{ opacity: 0, y: 10, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -81,14 +92,21 @@ export function Nav() {
               )}
             </AnimatePresence>
           </div>
-          {LINKS.map((l) => (
-            <Link key={l.label} to={l.to} className="nav-link">
-              {l.label}
-            </Link>
-          ))}
+          {navLinks.map((l) =>
+            l.to.includes('#') ? (
+              <Link key={l.label} to={l.to} className="nav-link">
+                {l.label}
+              </Link>
+            ) : (
+              <NavLink key={l.label} to={l.to} className={navClass}>
+                {l.label}
+              </NavLink>
+            ),
+          )}
         </nav>
 
         <div className="nav-cta">
+          <ThemeToggle />
           <MagneticButton to="/contact" variant="ghost" size="sm">
             Contact sales
           </MagneticButton>
@@ -97,15 +115,19 @@ export function Nav() {
           </MagneticButton>
         </div>
 
-        <button
-          className={`burger${menuOpen ? ' open' : ''}`}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <span />
-          <span />
-        </button>
+        <div className="nav-mobile-actions">
+          <ThemeToggle />
+          <button
+            type="button"
+            className={`burger${menuOpen ? ' open' : ''}`}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -124,7 +146,7 @@ export function Nav() {
               </Link>
             ))}
             <p className="eyebrow">Explore</p>
-            {LINKS.map((l) => (
+            {navLinks.map((l) => (
               <Link key={l.label} to={l.to} className="mobile-link">
                 {l.label}
               </Link>

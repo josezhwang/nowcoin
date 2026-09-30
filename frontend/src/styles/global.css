@@ -1,19 +1,37 @@
 @import 'lenis/dist/lenis.css';
 
+/*
+ * Design tokens. Dark is the default; [data-theme='light'] overrides colour
+ * tokens only. `--fg-rgb` drives every translucent overlay so surfaces,
+ * borders and hairlines flip automatically between themes.
+ */
 :root {
+  --fg-rgb: 255 255 255;
   --bg: #05050a;
   --bg-2: #0a0a13;
-  --surface: rgba(255, 255, 255, 0.035);
-  --surface-2: rgba(255, 255, 255, 0.06);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --surface: rgb(var(--fg-rgb) / 0.035);
+  --surface-2: rgb(var(--fg-rgb) / 0.06);
+  --border: rgb(var(--fg-rgb) / 0.08);
+  --border-strong: rgb(var(--fg-rgb) / 0.16);
   --text: #f5f5fa;
   --muted: #9b9bb4;
-  --faint: #5d5d75;
+  --faint: #6b6b85;
+  --on-primary: #07070d;
+
+  --nav-bg: rgb(10 10 19 / 0.65);
+  --popover-bg: rgb(12 12 22 / 0.92);
+  --overlay-bg: rgb(7 7 13 / 0.97);
+  --code-bg: rgb(8 8 16 / 0.8);
+  --inset-bg: rgb(0 0 0 / 0.3);
+  --store-bg: #07070d;
+  --store-fg: #f5f5fa;
+  --text-shadow: rgb(5 5 10 / 0.8);
+  --shadow-lg: 0 40px 120px -40px rgb(139 92 246 / 0.45);
 
   --violet: #8b5cf6;
   --cyan: #22d3ee;
   --lime: #c6f65b;
+  --accent-bg: #c6f65b;
   --pink: #f472b6;
   --up: #4ade80;
   --down: #fb7185;
@@ -31,6 +49,52 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --fg-rgb: 20 16 48;
+  --bg: #f4f3fb;
+  --bg-2: #ffffff;
+  --surface: rgb(255 255 255 / 0.6);
+  --surface-2: rgb(255 255 255 / 0.85);
+  --border: rgb(var(--fg-rgb) / 0.1);
+  --border-strong: rgb(var(--fg-rgb) / 0.18);
+  --text: #141030;
+  --muted: #55526e;
+  --faint: #7d7a96;
+  --on-primary: #ffffff;
+
+  --nav-bg: rgb(255 255 255 / 0.72);
+  --popover-bg: rgb(255 255 255 / 0.96);
+  --overlay-bg: rgb(244 243 251 / 0.98);
+  --code-bg: #120f2a;
+  --inset-bg: rgb(255 255 255 / 0.7);
+  --store-bg: #141030;
+  --store-fg: #ffffff;
+  --text-shadow: rgb(255 255 255 / 0.9);
+  --shadow-lg: 0 40px 100px -40px rgb(91 67 214 / 0.35);
+
+  --violet: #6d28d9;
+  --cyan: #0e7490;
+  --lime: #4d7c0f;
+  --up: #15803d;
+  --down: #e11d48;
+
+  --grad: linear-gradient(120deg, #6d28d9 0%, #0e7490 55%, #15803d 100%);
+
+  color-scheme: light;
+}
+
+/* Soften decorative colour blobs on the pale background. */
+:root[data-theme='light'] .glow {
+  opacity: 0.18 !important;
+}
+
+/* The theme switch animates via the View Transitions API (see ThemeProvider). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 *,
@@ -213,12 +277,13 @@ canvas {
 
 .btn-primary {
   background: var(--text);
-  color: #07070d;
-  box-shadow: 0 0 0 0 rgba(198, 246, 91, 0);
+  color: var(--on-primary);
+  box-shadow: 0 0 0 0 transparent;
 }
 
 .btn-primary:hover {
-  background: var(--lime);
+  background: var(--accent-bg);
+  color: #07070d;
   box-shadow: 0 10px 40px -8px rgba(198, 246, 91, 0.55);
 }
 
@@ -230,7 +295,7 @@ canvas {
 
 .btn-ghost:hover {
   background: var(--surface-2);
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgb(var(--fg-rgb) / 0.3);
 }
 
 .btn-sm {
@@ -253,13 +318,15 @@ canvas {
 .select,
 .textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgb(var(--fg-rgb) / 0.04);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   color: var(--text);
   font: inherit;
   padding: 14px 16px;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .input:focus,
@@ -295,7 +362,7 @@ canvas {
 /* ---------- Glass card ---------- */
 
 .glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(180deg, rgb(var(--fg-rgb) / 0.05), rgb(var(--fg-rgb) / 0.015));
   border: 1px solid var(--border);
   border-radius: var(--radius);
   backdrop-filter: blur(16px);

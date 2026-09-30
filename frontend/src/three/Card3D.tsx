@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
-import { CARD_DEPTH, CARD_HEIGHT, CARD_WIDTH, useCardBody } from './cardGeometry'
-import { useFontsReady } from '../lib/hooks'
-import { createCardBack, createCardFront } from './textures'
+import { CARD_DEPTH, CARD_HEIGHT, CARD_WIDTH, useCardBody } from '@/three/cardGeometry'
+import { useFontsReady } from '@/hooks/useFontsReady'
+import { createCardBack, createCardFront } from '@/three/textures'
 
 interface Card3DProps {
   colors: [string, string]

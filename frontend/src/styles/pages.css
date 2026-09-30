@@ -290,19 +290,6 @@
   margin: 40px 0 0;
 }
 
-.contact-info dt {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--faint);
-}
-
-.contact-info dd {
-  margin: 4px 0 0;
-  font-size: 18px;
-}
-
 .contact-form {
   position: relative;
   display: grid;

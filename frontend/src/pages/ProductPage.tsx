@@ -1,29 +1,49 @@
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { MagneticButton } from '../components/MagneticButton'
-import { Reveal, SplitWords } from '../components/Reveal'
-import { useApi } from '../lib/api'
-import { tiltHandlers, useReducedMotion } from '../lib/hooks'
-import type { Product } from '../lib/types'
-import { Cta } from '../sections/Cta'
-import { LazyCanvas } from '../three/LazyCanvas'
-import { OrbScene } from '../three/OrbScene'
-import { NotFound } from './NotFound'
+import { ApiError } from '@/api/client'
+import { useProduct, useProducts } from '@/api/queries'
+import { PageMeta } from '@/components/layout/PageMeta'
+import { GlowFallback } from '@/components/ui/CardFallback'
+import { MagneticButton } from '@/components/ui/MagneticButton'
+import { Reveal, SplitWords } from '@/components/ui/Reveal'
+import { tiltHandlers } from '@/lib/tilt'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { Cta } from '@/sections/Cta'
+import { LazyCanvas } from '@/three/LazyCanvas'
+import { OrbScene } from '@/three/OrbScene'
+import NotFound from '@/pages/NotFound'
 
-export function ProductPage() {
+export default function ProductPage() {
   const { slug = '' } = useParams()
-  const { data: product, error } = useApi<Product>(`/products/${slug}`)
-  const { data: all } = useApi<Product[]>('/products')
+  const { data: product, error, refetch } = useProduct(slug)
+  const { data: all } = useProducts()
   const reduced = useReducedMotion()
 
-  if (error) return <NotFound />
-  if (!product) return <div className="page-loading" />
+  if (error instanceof ApiError && error.status === 404) return <NotFound />
+  if (error) {
+    return (
+      <section className="page-hero container" role="alert">
+        <h1>Couldn't load this product.</h1>
+        <p className="page-lede">{error.message}</p>
+        <button type="button" className="btn btn-primary" onClick={() => refetch()}>
+          Try again
+        </button>
+      </section>
+    )
+  }
+  if (!product) return <div className="page-loading" aria-busy="true" />
 
   const others = all?.filter((p) => p.slug !== product.slug).slice(0, 3) ?? []
 
   return (
-    <div style={{ '--accent': product.accent } as React.CSSProperties}>
+    <div style={{ '--accent': product.accent } as CSSProperties}>
+      <PageMeta title={product.name} description={`${product.tagline} ${product.description}`} />
       <section className="product-hero">
-        <div className="glow" style={{ width: 560, height: 560, background: product.accent, top: -120, right: '10%', opacity: 0.3 }} />
+        <div
+          className="glow"
+          style={{ width: 560, height: 560, background: product.accent, top: -120, right: '10%', opacity: 0.3 }}
+        />
         <div className="container product-hero-grid">
           <div>
             <span className="eyebrow">{product.category}</span>
@@ -34,14 +54,19 @@ export function ProductPage() {
             <p className="product-desc">{product.description}</p>
             <div className="hero-actions">
               <MagneticButton to={product.category === 'Consumer' ? '/#download' : '/contact'}>
-                {product.category === 'Consumer' ? 'Get the app' : 'Talk to sales'} <span className="arrow">→</span>
+                {product.category === 'Consumer' ? 'Get the app' : 'Talk to sales'}{' '}
+                <ArrowRight size={16} className="arrow" aria-hidden />
               </MagneticButton>
               <MagneticButton to="/#products" variant="ghost">
                 All products
               </MagneticButton>
             </div>
           </div>
-          <LazyCanvas className="orb-canvas" camera={{ position: [0, 0, 6], fov: 40 }}>
+          <LazyCanvas
+            className="orb-canvas"
+            camera={{ position: [0, 0, 6], fov: 40 }}
+            fallback={<GlowFallback color={product.accent} />}
+          >
             <OrbScene color={product.accent} reduced={reduced} />
           </LazyCanvas>
         </div>
@@ -81,13 +106,15 @@ export function ProductPage() {
                   key={p.slug}
                   to={`/products/${p.slug}`}
                   className="related-card glass spotlight tilt"
-                  style={{ '--accent': p.accent } as React.CSSProperties}
+                  style={{ '--accent': p.accent } as CSSProperties}
                   {...tiltHandlers}
                 >
                   <span className="mega-dot" style={{ background: p.accent, boxShadow: `0 0 14px ${p.accent}` }} />
                   <h3>{p.name}</h3>
                   <p>{p.tagline}</p>
-                  <span className="bento-arrow">↗</span>
+                  <span className="bento-arrow" aria-hidden>
+                    <ArrowUpRight size={16} />
+                  </span>
                 </Link>
               ))}
             </div>

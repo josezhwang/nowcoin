@@ -1,31 +1,78 @@
+import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
-import { MagneticButton } from '../components/MagneticButton'
-import { Reveal } from '../components/Reveal'
-import { SectionHeading } from '../components/SectionHeading'
+import { MagneticButton } from '@/components/ui/MagneticButton'
+import { Reveal } from '@/components/ui/Reveal'
+import { SectionHeading } from '@/components/ui/SectionHeading'
 
 type Token = [cls: string, text: string]
 
 // Pre-tokenised snippets keep the bundle free of a syntax highlighter.
 const SNIPPETS: Record<string, Token[]> = {
   TypeScript: [
-    ['k', 'import'], ['', ' { Nowcoin } '], ['k', 'from'], ['s', " '@nowcoin/sdk'"], ['', '\n\n'],
-    ['k', 'const'], ['', ' nowcoin = '], ['k', 'new'], ['f', ' Nowcoin'], ['', '({ apiKey: process.env.'], ['v', 'NOWCOIN_KEY'], ['', ' })\n\n'],
+    ['k', 'import'],
+    ['', ' { Nowcoin } '],
+    ['k', 'from'],
+    ['s', " '@nowcoin/sdk'"],
+    ['', '\n\n'],
+    ['k', 'const'],
+    ['', ' nowcoin = '],
+    ['k', 'new'],
+    ['f', ' Nowcoin'],
+    ['', '({ apiKey: process.env.'],
+    ['v', 'NOWCOIN_KEY'],
+    ['', ' })\n\n'],
     ['c', '// Create a non-custodial wallet on sign-up\n'],
-    ['k', 'const'], ['', ' wallet = '], ['k', 'await'], ['', ' nowcoin.wallets.'], ['f', 'create'], ['', '({ userId: '], ['s', "'usr_8f2k'"], ['', ' })\n\n'],
+    ['k', 'const'],
+    ['', ' wallet = '],
+    ['k', 'await'],
+    ['', ' nowcoin.wallets.'],
+    ['f', 'create'],
+    ['', '({ userId: '],
+    ['s', "'usr_8f2k'"],
+    ['', ' })\n\n'],
     ['c', '// Issue a virtual card funded from that wallet\n'],
-    ['k', 'const'], ['', ' card = '], ['k', 'await'], ['', ' nowcoin.cards.'], ['f', 'issue'], ['', '({\n  walletId: wallet.id,\n  currency: '], ['s', "'EUR'"], ['', ',\n  type: '], ['s', "'virtual'"], ['', ',\n})'],
+    ['k', 'const'],
+    ['', ' card = '],
+    ['k', 'await'],
+    ['', ' nowcoin.cards.'],
+    ['f', 'issue'],
+    ['', '({\n  walletId: wallet.id,\n  currency: '],
+    ['s', "'EUR'"],
+    ['', ',\n  type: '],
+    ['s', "'virtual'"],
+    ['', ',\n})'],
   ],
   Python: [
-    ['k', 'from'], ['', ' nowcoin '], ['k', 'import'], ['', ' Nowcoin\n\n'],
-    ['', 'nowcoin = '], ['f', 'Nowcoin'], ['', '(api_key=os.environ['], ['s', '"NOWCOIN_KEY"'], ['', '])\n\n'],
+    ['k', 'from'],
+    ['', ' nowcoin '],
+    ['k', 'import'],
+    ['', ' Nowcoin\n\n'],
+    ['', 'nowcoin = '],
+    ['f', 'Nowcoin'],
+    ['', '(api_key=os.environ['],
+    ['s', '"NOWCOIN_KEY"'],
+    ['', '])\n\n'],
     ['c', '# Create a non-custodial wallet on sign-up\n'],
-    ['', 'wallet = nowcoin.wallets.'], ['f', 'create'], ['', '(user_id='], ['s', '"usr_8f2k"'], ['', ')\n\n'],
+    ['', 'wallet = nowcoin.wallets.'],
+    ['f', 'create'],
+    ['', '(user_id='],
+    ['s', '"usr_8f2k"'],
+    ['', ')\n\n'],
     ['c', '# Issue a virtual card funded from that wallet\n'],
-    ['', 'card = nowcoin.cards.'], ['f', 'issue'], ['', '(\n    wallet_id=wallet.id,\n    currency='], ['s', '"EUR"'], ['', ',\n    type='], ['s', '"virtual"'], ['', ',\n)'],
+    ['', 'card = nowcoin.cards.'],
+    ['f', 'issue'],
+    ['', '(\n    wallet_id=wallet.id,\n    currency='],
+    ['s', '"EUR"'],
+    ['', ',\n    type='],
+    ['s', '"virtual"'],
+    ['', ',\n)'],
   ],
   cURL: [
-    ['f', 'curl'], ['', ' https://api.nowcoin.digital/v1/cards \\\n  -H '], ['s', '"Authorization: Bearer $NOWCOIN_KEY"'], ['', ' \\\n  -d '],
-    ['s', "'{\n    \"walletId\": \"wal_3k9x\",\n    \"currency\": \"EUR\",\n    \"type\": \"virtual\"\n  }'"],
+    ['f', 'curl'],
+    ['', ' https://api.nowcoin.digital/v1/cards \\\n  -H '],
+    ['s', '"Authorization: Bearer $NOWCOIN_KEY"'],
+    ['', ' \\\n  -d '],
+    ['s', '\'{\n    "walletId": "wal_3k9x",\n    "currency": "EUR",\n    "type": "virtual"\n  }\''],
   ],
 }
 
@@ -56,7 +103,7 @@ export function Developers() {
           </div>
           <div className="dev-actions">
             <MagneticButton to="/products/api">
-              Read the docs <span className="arrow">→</span>
+              Read the docs <ArrowRight size={16} className="arrow" aria-hidden />
             </MagneticButton>
             <MagneticButton to="/contact" variant="ghost">
               Get sandbox keys
@@ -73,7 +120,13 @@ export function Developers() {
             </span>
             <div className="code-tabs" role="tablist">
               {Object.keys(SNIPPETS).map((l) => (
-                <button key={l} role="tab" aria-selected={l === lang} className={l === lang ? 'active' : ''} onClick={() => setLang(l)}>
+                <button
+                  key={l}
+                  role="tab"
+                  aria-selected={l === lang}
+                  className={l === lang ? 'active' : ''}
+                  onClick={() => setLang(l)}
+                >
                   {l}
                 </button>
               ))}
@@ -81,7 +134,7 @@ export function Developers() {
           </div>
           <pre className="code-body">
             <code>
-              {SNIPPETS[lang].map(([cls, text], i) => (
+              {(SNIPPETS[lang] ?? []).map(([cls, text], i) => (
                 <span key={i} className={cls ? `tk-${cls}` : undefined}>
                   {text}
                 </span>

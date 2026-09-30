@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Reveal } from './Reveal'
+import { Reveal } from '@/components/ui/Reveal'
 
 interface Props {
   eyebrow: string

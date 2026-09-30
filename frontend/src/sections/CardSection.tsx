@@ -1,15 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowRight, Check } from 'lucide-react'
 import { useState } from 'react'
-import { MagneticButton } from '../components/MagneticButton'
-import { SectionHeading } from '../components/SectionHeading'
-import { useApi } from '../lib/api'
-import { useReducedMotion } from '../lib/hooks'
-import type { CardTier } from '../lib/types'
-import { CardScene } from '../three/CardScene'
-import { LazyCanvas } from '../three/LazyCanvas'
+import { MagneticButton } from '@/components/ui/MagneticButton'
+import { SectionHeading } from '@/components/ui/SectionHeading'
+import { useCardTiers } from '@/api/queries'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { CardScene } from '@/three/CardScene'
+import { LazyCanvas } from '@/three/LazyCanvas'
+import { CardFallback } from '@/components/ui/CardFallback'
 
 export function CardSection() {
-  const { data: tiers, error } = useApi<CardTier[]>('/cards')
+  const { data: tiers, isError: error } = useCardTiers()
   const [index, setIndex] = useState(1)
   const reduced = useReducedMotion()
   const tier = tiers?.[index]
@@ -49,7 +50,10 @@ export function CardSection() {
                     onClick={() => setIndex(i)}
                   >
                     {i === index && <motion.span layoutId="tier-pill" className="tier-pill" />}
-                    <span className="tier-swatch" style={{ background: `linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})` }} />
+                    <span
+                      className="tier-swatch"
+                      style={{ background: `linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})` }}
+                    />
                     {t.name}
                   </button>
                 ))}
@@ -80,20 +84,28 @@ export function CardSection() {
                   </div>
                   <ul className="tier-perks">
                     {tier.perks.map((p) => (
-                      <li key={p}>{p}</li>
+                      <li key={p}>
+                        <Check size={16} aria-hidden />
+                        {p}
+                      </li>
                     ))}
                   </ul>
                 </motion.div>
               </AnimatePresence>
 
               <MagneticButton to="/products/card">
-                Order your card <span className="arrow">→</span>
+                Order your card <ArrowRight size={16} className="arrow" aria-hidden />
               </MagneticButton>
             </>
           )}
         </div>
 
-        <LazyCanvas className="card-canvas" cursor="Drag" camera={{ position: [0, 0, 6], fov: 40 }}>
+        <LazyCanvas
+          className="card-canvas"
+          cursor="Drag"
+          camera={{ position: [0, 0, 6], fov: 40 }}
+          fallback={tier && <CardFallback colors={tier.colors} name={tier.name} />}
+        >
           {tier && <CardScene tier={tier} reduced={reduced} />}
         </LazyCanvas>
       </div>

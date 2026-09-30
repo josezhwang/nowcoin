@@ -1,6 +1,6 @@
-import { Counter } from '../components/Counter'
-import { Reveal } from '../components/Reveal'
-import type { Stat } from '../lib/types'
+import { Counter } from '@/components/ui/Counter'
+import { Reveal } from '@/components/ui/Reveal'
+import type { Stat } from '@/api/types'
 
 export function Stats({ stats }: { stats: Stat[] }) {
   return (

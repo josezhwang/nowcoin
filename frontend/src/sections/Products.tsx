@@ -1,13 +1,14 @@
+import { ArrowUpRight } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { Reveal } from '../components/Reveal'
-import { SectionHeading } from '../components/SectionHeading'
-import { useApi } from '../lib/api'
-import { tiltHandlers } from '../lib/hooks'
-import type { Product } from '../lib/types'
-import { ProductVisual } from './ProductVisual'
+import { Reveal } from '@/components/ui/Reveal'
+import { SectionHeading } from '@/components/ui/SectionHeading'
+import { useProducts } from '@/api/queries'
+import { tiltHandlers } from '@/lib/tilt'
+import { ProductVisual } from '@/sections/ProductVisual'
 
 export function Products() {
-  const { data, error } = useApi<Product[]>('/products')
+  const { data, isError, refetch } = useProducts()
 
   return (
     <section className="section" id="products">
@@ -22,7 +23,14 @@ export function Products() {
           body="From your first satoshi to treasury-grade custody, every Nowcoin Digital product shares one login, one balance and one security model."
         />
 
-        {error && <p className="error-note">Products are unavailable right now. Please try again shortly.</p>}
+        {isError && (
+          <p className="error-note" role="alert">
+            Products are unavailable right now.{' '}
+            <button type="button" className="link-button" onClick={() => refetch()}>
+              Try again
+            </button>
+          </p>
+        )}
 
         <div className="bento">
           {data
@@ -32,13 +40,13 @@ export function Products() {
                     to={`/products/${p.slug}`}
                     className="bento-tile glass spotlight tilt"
                     data-cursor="View"
-                    style={{ '--accent': p.accent } as React.CSSProperties}
+                    style={{ '--accent': p.accent } as CSSProperties}
                     {...tiltHandlers}
                   >
                     <div className="bento-head">
                       <span className="bento-cat">{p.category}</span>
                       <span className="bento-arrow" aria-hidden>
-                        ↗
+                        <ArrowUpRight size={16} />
                       </span>
                     </div>
                     <div className="bento-visual">
@@ -51,8 +59,10 @@ export function Products() {
                   </Link>
                 </Reveal>
               ))
-            : !error &&
-              Array.from({ length: 6 }, (_, i) => <div key={i} className="bento-cell skeleton" style={{ minHeight: 320 }} />)}
+            : !isError &&
+              Array.from({ length: 6 }, (_, i) => (
+                <div key={i} className="bento-cell skeleton" style={{ minHeight: 320 }} />
+              ))}
         </div>
       </div>
     </section>

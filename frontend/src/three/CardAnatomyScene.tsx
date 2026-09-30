@@ -3,10 +3,10 @@ import { useFrame } from '@react-three/fiber'
 import type { MotionValue } from 'framer-motion'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { useFontsReady } from '../lib/hooks'
-import { CARD_DEPTH, CARD_HEIGHT, CARD_WIDTH, useCardBody } from './cardGeometry'
-import { StudioLights } from './StudioLights'
-import { createCardBack, createCardFront } from './textures'
+import { useFontsReady } from '@/hooks/useFontsReady'
+import { CARD_DEPTH, CARD_HEIGHT, CARD_WIDTH, useCardBody } from '@/three/cardGeometry'
+import { StudioLights } from '@/three/StudioLights'
+import { createCardBack, createCardFront } from '@/three/textures'
 
 const COLORS: [string, string] = ['#6d28d9', '#0891b2']
 const smooth = (a: number, b: number, x: number) => THREE.MathUtils.smoothstep(x, a, b)
@@ -99,7 +99,12 @@ export function CardAnatomyScene({ progress, reduced }: Props) {
         </group>
 
         <group ref={coilRef}>
-          <Line points={coil} color={new THREE.Color('#22d3ee').multiplyScalar(1.8)} lineWidth={2.2} toneMapped={false} />
+          <Line
+            points={coil}
+            color={new THREE.Color('#22d3ee').multiplyScalar(1.8)}
+            lineWidth={2.2}
+            toneMapped={false}
+          />
           <mesh position={[CHIP.x, CHIP.y, 0]}>
             <boxGeometry args={[CHIP.w * 0.7, CHIP.h * 0.7, 0.02]} />
             <meshBasicMaterial color="#22d3ee" toneMapped={false} />
@@ -107,7 +112,14 @@ export function CardAnatomyScene({ progress, reduced }: Props) {
         </group>
 
         <mesh ref={coreRef} geometry={body}>
-          <meshPhysicalMaterial color="#d1d5db" metalness={0.85} roughness={0.3} clearcoat={0.6} emissive="#1e293b" emissiveIntensity={0.6} />
+          <meshPhysicalMaterial
+            color="#d1d5db"
+            metalness={0.85}
+            roughness={0.3}
+            clearcoat={0.6}
+            emissive="#1e293b"
+            emissiveIntensity={0.6}
+          />
         </mesh>
 
         <mesh ref={backRef} rotation={[0, Math.PI, 0]}>

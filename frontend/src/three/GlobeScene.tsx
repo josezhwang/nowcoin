@@ -2,6 +2,7 @@ import { Line } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { useTheme } from '@/theme/useTheme'
 
 const R = 2
 
@@ -21,8 +22,20 @@ const CITIES: [name: string, lat: number, lon: number][] = [
 ]
 
 const ROUTES: [number, number][] = [
-  [0, 1], [1, 2], [0, 5], [5, 6], [6, 7], [7, 8], [8, 9], [7, 10],
-  [1, 3], [0, 4], [11, 5], [2, 8], [3, 4], [11, 7],
+  [0, 1],
+  [1, 2],
+  [0, 5],
+  [5, 6],
+  [6, 7],
+  [7, 8],
+  [8, 9],
+  [7, 10],
+  [1, 3],
+  [0, 4],
+  [11, 5],
+  [2, 8],
+  [3, 4],
+  [11, 7],
 ]
 
 function latLon(lat: number, lon: number, r = R) {
@@ -58,7 +71,6 @@ function useDotSphere(count: number) {
 }
 
 const atmosphereShader = {
-  uniforms: { color: { value: new THREE.Color('#7c5cff') } },
   vertexShader: /* glsl */ `
     varying vec3 vNormal;
     void main() {
@@ -70,11 +82,19 @@ const atmosphereShader = {
     varying vec3 vNormal;
     void main() {
       float intensity = pow(0.62 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 4.0);
-      gl_FragColor = vec4(color, 1.0) * intensity * 1.1;
+      gl_FragColor = vec4(color, clamp(intensity * 1.1, 0.0, 1.0));
     }`,
 }
 
-function Arc({ from, to, delay, reduced }: { from: THREE.Vector3; to: THREE.Vector3; delay: number; reduced: boolean }) {
+interface ArcProps {
+  from: THREE.Vector3
+  to: THREE.Vector3
+  delay: number
+  reduced: boolean
+  color: string
+}
+
+function Arc({ from, to, delay, reduced, color }: ArcProps) {
   const pulse = useRef<THREE.Mesh>(null)
   const curve = useMemo(() => {
     const mid = from.clone().add(to).multiplyScalar(0.5)
@@ -93,7 +113,7 @@ function Arc({ from, to, delay, reduced }: { from: THREE.Vector3; to: THREE.Vect
 
   return (
     <>
-      <Line points={points} color="#22d3ee" lineWidth={1.2} transparent opacity={0.45} />
+      <Line points={points} color={color} lineWidth={1.2} transparent opacity={0.5} />
       <mesh ref={pulse}>
         <sphereGeometry args={[0.035, 12, 12]} />
         <meshBasicMaterial color="#c6f65b" toneMapped={false} />
@@ -131,6 +151,11 @@ function CityMarker({ position, reduced, i }: { position: THREE.Vector3; reduced
 /** A dotted planet with glowing settlement routes between financial hubs. */
 export function GlobeScene({ reduced }: { reduced: boolean }) {
   const spin = useRef<THREE.Group>(null)
+  const { palette } = useTheme()
+  const atmosphereUniforms = useMemo(
+    () => ({ color: { value: new THREE.Color(palette.atmosphere) } }),
+    [palette.atmosphere],
+  )
   const dots = useDotSphere(9000)
   const cities = useMemo(() => CITIES.map(([, lat, lon]) => latLon(lat, lon, R * 1.005)), [])
 
@@ -148,21 +173,35 @@ export function GlobeScene({ reduced }: { reduced: boolean }) {
       <group ref={spin} rotation={[0.35, -1.6, 0]}>
         <mesh>
           <sphereGeometry args={[R * 0.995, 64, 64]} />
-          <meshBasicMaterial color="#07071a" />
+          <meshBasicMaterial color={palette.globeOcean} />
         </mesh>
         <points geometry={dots}>
-          <pointsMaterial size={0.028} color="#8b7cf6" transparent opacity={0.85} sizeAttenuation depthWrite={false} />
+          <pointsMaterial
+            size={0.028}
+            color={palette.globeDots}
+            transparent
+            opacity={0.85}
+            sizeAttenuation
+            depthWrite={false}
+          />
         </points>
         {cities.map((p, i) => (
           <CityMarker key={i} position={p} reduced={reduced} i={i} />
         ))}
         {ROUTES.map(([a, b], i) => (
-          <Arc key={i} from={cities[a]} to={cities[b]} delay={i * 0.23} reduced={reduced} />
+          <Arc key={i} from={cities[a]!} to={cities[b]!} delay={i * 0.23} reduced={reduced} color={palette.globeArc} />
         ))}
       </group>
       <mesh scale={1.12}>
         <sphereGeometry args={[R, 64, 64]} />
-        <shaderMaterial args={[atmosphereShader]} side={THREE.BackSide} blending={THREE.AdditiveBlending} transparent depthWrite={false} />
+        <shaderMaterial
+          key={palette.atmosphere}
+          args={[{ ...atmosphereShader, uniforms: atmosphereUniforms }]}
+          side={THREE.BackSide}
+          blending={palette.additive ? THREE.AdditiveBlending : THREE.NormalBlending}
+          transparent
+          depthWrite={false}
+        />
       </mesh>
     </>
   )

@@ -23,9 +23,7 @@ main,
   place-items: center;
   align-content: center;
   gap: 48px;
-  background:
-    radial-gradient(60% 50% at 50% 45%, rgba(109, 40, 217, 0.35), transparent 70%),
-    var(--bg);
+  background: radial-gradient(60% 50% at 50% 45%, rgba(109, 40, 217, 0.35), transparent 70%), var(--bg);
 }
 
 .coin3d {
@@ -153,7 +151,7 @@ main,
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid rgb(var(--fg-rgb) / 0.45);
   font-family: var(--font-mono);
   font-size: 0;
   letter-spacing: 0.12em;
@@ -217,7 +215,11 @@ main,
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s;
-  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.12), transparent 60%);
+  background: radial-gradient(
+    300px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.12),
+    transparent 60%
+  );
 }
 
 .tilt.is-tilting::after {
@@ -265,7 +267,7 @@ main,
 }
 
 .kb-word.outline {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(180deg, rgb(var(--fg-rgb) / 0.28), rgb(var(--fg-rgb) / 0.03));
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -464,5 +466,5 @@ main,
 
 .cta-panel h2,
 .cta-panel > p {
-  text-shadow: 0 4px 30px rgba(5, 5, 10, 0.8);
+  text-shadow: 0 4px 30px var(--text-shadow);
 }

@@ -1,6 +1,6 @@
 import { animate, useInView } from 'framer-motion'
 import { useEffect, useRef } from 'react'
-import type { Stat } from '../lib/types'
+import type { Stat } from '@/api/types'
 
 /** Counts up from zero the first time it scrolls into view. */
 export function Counter({ value, prefix = '', suffix = '', decimals = 0 }: Omit<Stat, 'label'>) {

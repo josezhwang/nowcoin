@@ -1,9 +1,10 @@
-import { Counter } from '../components/Counter'
-import { Reveal } from '../components/Reveal'
-import { SectionHeading } from '../components/SectionHeading'
-import { useReducedMotion } from '../lib/hooks'
-import { GlobeScene } from '../three/GlobeScene'
-import { LazyCanvas } from '../three/LazyCanvas'
+import { Counter } from '@/components/ui/Counter'
+import { Reveal } from '@/components/ui/Reveal'
+import { SectionHeading } from '@/components/ui/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { GlobeScene } from '@/three/GlobeScene'
+import { LazyCanvas } from '@/three/LazyCanvas'
+import { GlowFallback } from '@/components/ui/CardFallback'
 
 const FACTS = [
   { value: 60, suffix: '+', label: 'countries with same-day settlement' },
@@ -37,7 +38,11 @@ export function Network() {
             ))}
           </div>
         </div>
-        <LazyCanvas className="globe-canvas" camera={{ position: [0, 0, 7], fov: 45 }}>
+        <LazyCanvas
+          className="globe-canvas"
+          camera={{ position: [0, 0, 7], fov: 45 }}
+          fallback={<GlowFallback color="#22d3ee" />}
+        >
           <GlobeScene reduced={reduced} />
         </LazyCanvas>
       </div>

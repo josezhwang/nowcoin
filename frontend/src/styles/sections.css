@@ -19,8 +19,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgb(var(--fg-rgb) / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--fg-rgb) / 0.045) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 70% 60% at 60% 45%, #000 20%, transparent 75%);
 }
@@ -43,7 +43,7 @@
   padding: 6px 14px 6px 6px;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgb(var(--fg-rgb) / 0.04);
   backdrop-filter: blur(10px);
   font-size: 13px;
   color: var(--muted);
@@ -53,7 +53,7 @@
 .pill-tag {
   padding: 3px 10px;
   border-radius: 999px;
-  background: var(--lime);
+  background: var(--accent-bg);
   color: #07070d;
   font-weight: 700;
   font-size: 11px;
@@ -179,7 +179,7 @@
   display: flex;
   align-items: center;
   border-block: 1px solid var(--border);
-  background: rgba(10, 10, 19, 0.7);
+  background: var(--nav-bg);
   backdrop-filter: blur(12px);
   height: 64px;
 }
@@ -320,7 +320,7 @@
   font-size: clamp(20px, 2.4vw, 28px);
   font-weight: 500;
   letter-spacing: -0.03em;
-  color: rgba(255, 255, 255, 0.28);
+  color: rgb(var(--fg-rgb) / 0.28);
   padding: 0 clamp(24px, 4vw, 56px);
   white-space: nowrap;
   transition: color 0.3s;
@@ -400,7 +400,7 @@
 .related-card:hover .bento-arrow,
 .opening:hover .bento-arrow {
   background: var(--text);
-  color: #07070d;
+  color: var(--on-primary);
   transform: rotate(45deg);
 }
 
@@ -649,7 +649,7 @@
   margin: 0;
   padding: 20px;
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--inset-bg);
   border: 1px solid var(--border);
   font-family: var(--font-mono);
   font-size: 13px;
@@ -744,7 +744,7 @@
 }
 
 .tier-tab.active {
-  color: #07070d;
+  color: var(--on-primary);
 }
 
 .tier-pill {
@@ -808,10 +808,13 @@
   color: var(--muted);
 }
 
-.tier-perks li::before {
-  content: '✓';
+.tier-perks li {
+  align-items: center;
+}
+
+.tier-perks svg {
+  flex: none;
   color: var(--lime);
-  font-weight: 700;
 }
 
 @media (max-width: 900px) {
@@ -991,9 +994,20 @@
 }
 
 .code-window {
+  /* Always a dark editor surface, whatever the page theme. */
+  --fg-rgb: 255 255 255;
+  --text: #f5f5fa;
+  --muted: #9b9bb4;
+  --faint: #6b6b85;
+  --lime: #c6f65b;
+  --cyan: #22d3ee;
+  --pink: #f472b6;
+  --border: rgb(255 255 255 / 0.08);
+  --surface-2: rgb(255 255 255 / 0.06);
+  color: var(--text);
   overflow: hidden;
-  background: rgba(8, 8, 16, 0.8);
-  box-shadow: 0 40px 120px -40px rgba(139, 92, 246, 0.45);
+  background: var(--code-bg);
+  box-shadow: var(--shadow-lg);
 }
 
 .code-bar {
@@ -1013,7 +1027,7 @@
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgb(var(--fg-rgb) / 0.15);
 }
 
 .code-tabs {
@@ -1109,7 +1123,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--grad);
+  background: linear-gradient(120deg, #a78bfa, #22d3ee 55%, #c6f65b);
   color: #07070d;
   font-weight: 700;
   font-size: 13px;
@@ -1173,9 +1187,9 @@
 }
 
 .faq.open .faq-icon {
-  background: var(--lime);
+  background: var(--accent-bg);
   color: #07070d;
-  border-color: var(--lime);
+  border-color: var(--accent-bg);
 }
 
 .faq.open .faq-icon::after {
@@ -1210,8 +1224,7 @@
   border: 1px solid var(--border-strong);
   background:
     radial-gradient(120% 120% at 100% 0%, rgba(139, 92, 246, 0.35), transparent 50%),
-    radial-gradient(90% 90% at 0% 100%, rgba(34, 211, 238, 0.22), transparent 50%),
-    var(--bg-2);
+    radial-gradient(90% 90% at 0% 100%, rgba(34, 211, 238, 0.22), transparent 50%), var(--bg-2);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -1257,7 +1270,8 @@
   gap: 12px;
   padding: 12px 22px;
   border-radius: 16px;
-  background: #07070d;
+  background: var(--store-bg);
+  color: var(--store-fg);
   border: 1px solid var(--border-strong);
   font-weight: 600;
   text-align: left;
@@ -1290,7 +1304,7 @@
   padding: 6px;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--inset-bg);
 }
 
 .newsletter .input {

@@ -2,9 +2,9 @@ import { ContactShadows, Float, PresentationControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import type { CardTier } from '../lib/types'
-import { Card3D } from './Card3D'
-import { StudioLights } from './StudioLights'
+import type { CardTier } from '@/api/types'
+import { Card3D } from '@/three/Card3D'
+import { StudioLights } from '@/three/StudioLights'
 
 /** Interactive tier showcase: drag to rotate; switching tiers spins the card. */
 export function CardScene({ tier, reduced }: { tier: CardTier; reduced: boolean }) {
@@ -28,14 +28,7 @@ export function CardScene({ tier, reduced }: { tier: CardTier; reduced: boolean 
   return (
     <>
       <StudioLights tint={tier.colors[1]} />
-      <PresentationControls
-        global={false}
-        cursor
-        snap
-        speed={1.4}
-        polar={[-0.4, 0.4]}
-        azimuth={[-0.8, 0.8]}
-      >
+      <PresentationControls global={false} cursor snap speed={1.4} polar={[-0.4, 0.4]} azimuth={[-0.8, 0.8]}>
         <Float enabled={!reduced} speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
           <group ref={spin} rotation={[0.1, 0, -0.08]}>
             <Card3D colors={tier.colors} tierName={tier.name} metal={tier.material === 'metal'} />

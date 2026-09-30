@@ -1,6 +1,6 @@
 import { AnimatePresence, animate, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { finishIntro } from '../lib/intro'
+import { finishIntro } from '@/lib/intro'
 
 const MIN_MS = 1600
 

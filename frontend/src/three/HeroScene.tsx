@@ -2,10 +2,11 @@ import { Float } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { seeded } from './random'
-import { Card3D } from './Card3D'
-import { Coin3D } from './Coin3D'
-import { CAMERA_START_Z, FOV } from './worldConfig'
+import { seeded } from '@/three/random'
+import { Card3D } from '@/three/Card3D'
+import { Coin3D } from '@/three/Coin3D'
+import { CAMERA_START_Z, FOV } from '@/three/worldConfig'
+import { useTheme } from '@/theme/useTheme'
 
 const COINS: { symbol: string; colors: [string, string]; phase: number; radius: number; orbit: number }[] = [
   { symbol: '₿', colors: ['#fcd34d', '#d97706'], phase: 0, radius: 0.42, orbit: 2.1 },
@@ -38,6 +39,7 @@ function OrbitingCoin({ coin, reduced }: { coin: (typeof COINS)[number]; reduced
 /** A swirling disk of glowing particles around the card, like an accretion disk. */
 function ParticleDisk({ count, reduced }: { count: number; reduced: boolean }) {
   const ref = useRef<THREE.Points>(null)
+  const { palette } = useTheme()
   const geometry = useMemo(() => {
     const rand = seeded(11)
     const positions = new Float32Array(count * 3)
@@ -49,14 +51,16 @@ function ParticleDisk({ count, reduced }: { count: number; reduced: boolean }) {
       const r = 2.6 + Math.pow(rand(), 1.6) * 2.2
       const theta = rand() * Math.PI * 2
       positions.set([Math.cos(theta) * r, (rand() - 0.5) * 0.18 * r, Math.sin(theta) * r], i * 3)
-      c.copy(a).lerp(b, (r - 2.6) / 2.2).multiplyScalar(1.6)
+      c.copy(a)
+        .lerp(b, (r - 2.6) / 2.2)
+        .multiplyScalar(palette.additive ? 1.6 : 0.85)
       colors.set([c.r, c.g, c.b], i * 3)
     }
     const geo = new THREE.BufferGeometry()
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
     return geo
-  }, [count])
+  }, [count, palette.additive])
 
   useFrame((_, dt) => {
     if (!reduced && ref.current) ref.current.rotation.y += dt * 0.12
@@ -64,7 +68,16 @@ function ParticleDisk({ count, reduced }: { count: number; reduced: boolean }) {
 
   return (
     <points ref={ref} geometry={geometry} rotation={[0.35, 0, 0.18]}>
-      <pointsMaterial size={0.035} vertexColors transparent opacity={0.9} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      <pointsMaterial
+        key={String(palette.additive)}
+        size={palette.additive ? 0.035 : 0.04}
+        vertexColors
+        transparent
+        opacity={0.9}
+        depthWrite={false}
+        blending={palette.additive ? THREE.AdditiveBlending : THREE.NormalBlending}
+        toneMapped={false}
+      />
     </points>
   )
 }
@@ -125,7 +138,6 @@ export function HeroScene({ reduced }: { reduced: boolean }) {
       card.current.rotation.z = 0.12 - scroll * 0.3
     }
   })
-
 
   return (
     <group ref={root} position={[x, y, 0]} scale={scale}>

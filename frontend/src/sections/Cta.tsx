@@ -1,29 +1,19 @@
+import { Play, Smartphone } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Reveal } from '../components/Reveal'
-import { post } from '../lib/api'
-import { useReducedMotion } from '../lib/hooks'
-import { CoinRainScene } from '../three/CoinRainScene'
-import { LazyCanvas } from '../three/LazyCanvas'
+import { useSubscribe } from '@/api/queries'
+import { Reveal } from '@/components/ui/Reveal'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { CoinRainScene } from '@/three/CoinRainScene'
+import { LazyCanvas } from '@/three/LazyCanvas'
 
 export function Cta() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null)
-  const [sending, setSending] = useState(false)
+  const subscribe = useSubscribe()
   const reduced = useReducedMotion()
 
-  const submit = async (e: FormEvent) => {
+  const submit = (e: FormEvent) => {
     e.preventDefault()
-    setSending(true)
-    setStatus(null)
-    try {
-      await post('/newsletter', { email })
-      setStatus({ ok: true, msg: "You're on the list. Welcome aboard." })
-      setEmail('')
-    } catch (err) {
-      setStatus({ ok: false, msg: (err as Error).message })
-    } finally {
-      setSending(false)
-    }
+    subscribe.mutate(email, { onSuccess: () => setEmail('') })
   }
 
   return (
@@ -31,7 +21,7 @@ export function Cta() {
       <div className="container">
         <Reveal className="cta-panel">
           <div className="cta-orb" aria-hidden />
-          <LazyCanvas className="cta-coins" camera={{ position: [0, 0, 8], fov: 40 }}>
+          <LazyCanvas className="cta-coins" camera={{ position: [0, 0, 8], fov: 40 }} fallback={null}>
             <CoinRainScene reduced={reduced} count={window.innerWidth < 700 ? 10 : 22} />
           </LazyCanvas>
           <span className="eyebrow">Join 2.4M+ people</span>
@@ -44,20 +34,20 @@ export function Cta() {
 
           <div className="store-buttons">
             <a href="#" className="store">
-              <span aria-hidden>↓</span>
+              <Smartphone size={20} aria-hidden />
               <span>
                 <small>Download on the</small>App Store
               </span>
             </a>
             <a href="#" className="store">
-              <span aria-hidden>↓</span>
+              <Play size={20} aria-hidden />
               <span>
                 <small>Get it on</small>Google Play
               </span>
             </a>
           </div>
 
-          <form className="newsletter" onSubmit={submit}>
+          <form className="newsletter" onSubmit={submit} noValidate={false}>
             <label htmlFor="nl-email" className="sr-only">
               Email address
             </label>
@@ -65,17 +55,26 @@ export function Cta() {
               id="nl-email"
               className="input"
               type="email"
+              autoComplete="email"
               required
               placeholder="you@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={subscribe.isError || undefined}
+              aria-describedby="nl-status"
             />
-            <button className="btn btn-primary" disabled={sending}>
-              {sending ? 'Joining…' : 'Get product updates'}
+            <button type="submit" className="btn btn-primary" disabled={subscribe.isPending}>
+              {subscribe.isPending ? 'Joining…' : 'Get product updates'}
             </button>
           </form>
-          <p className={`form-status ${status?.ok ? 'ok' : 'err'}`} role="status">
-            {status?.msg}
+          <p
+            id="nl-status"
+            className={`form-status ${subscribe.isSuccess ? 'ok' : 'err'}`}
+            role="status"
+            aria-live="polite"
+          >
+            {subscribe.isSuccess && "You're on the list. Welcome aboard."}
+            {subscribe.isError && subscribe.error.message}
           </p>
         </Reveal>
       </div>

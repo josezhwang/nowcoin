@@ -2,7 +2,8 @@ import { Edges, Float } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { StudioLights } from './StudioLights'
+import { useTheme } from '@/theme/useTheme'
+import { StudioLights } from '@/three/StudioLights'
 
 const SHARDS = 14
 
@@ -11,6 +12,7 @@ const SHARDS = 14
  * MPC custody, where a key is split into pieces no one party holds.
  */
 export function VaultScene({ reduced }: { reduced: boolean }) {
+  const { palette } = useTheme()
   const shell = useRef<THREE.Mesh>(null)
   const orbit = useRef<THREE.Group>(null)
   const core = useRef<THREE.Mesh>(null)
@@ -50,7 +52,7 @@ export function VaultScene({ reduced }: { reduced: boolean }) {
           <mesh ref={shell}>
             <icosahedronGeometry args={[1.35, 0]} />
             <meshPhysicalMaterial
-              color="#0b1024"
+              color={palette.vaultShell}
               metalness={0.3}
               roughness={0.05}
               transparent

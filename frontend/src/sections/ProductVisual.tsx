@@ -1,4 +1,5 @@
-import { Sparkline } from '../components/Sparkline'
+import { Lock } from 'lucide-react'
+import { Sparkline } from '@/components/ui/Sparkline'
 
 // Lightweight CSS/SVG illustrations for each bento tile.
 const CHART = [22, 24, 23, 27, 26, 30, 29, 34, 32, 37, 41, 39, 44, 48, 46, 52]
@@ -17,7 +18,7 @@ export function ProductVisual({ slug }: { slug: string }) {
             ['BTC', 'Bitcoin', '0.4120', '#f59e0b'],
             ['ETH', 'Ethereum', '5.83', '#8b5cf6'],
             ['SOL', 'Solana', '112.4', '#22d3ee'],
-          ].map(([sym, name, amt, c]) => (
+          ].map(([sym = '', name, amt, c]) => (
             <div className="pv-asset" key={sym}>
               <span className="pv-coin" style={{ background: c }}>
                 {sym[0]}
@@ -70,7 +71,9 @@ export function ProductVisual({ slug }: { slug: string }) {
           {[0, 1, 2].map((i) => (
             <span key={i} className="pv-ring" style={{ animationDelay: `${i * -2}s` }} />
           ))}
-          <span className="pv-lock">🔒</span>
+          <span className="pv-lock">
+            <Lock size={26} aria-hidden />
+          </span>
         </div>
       )
     case 'api':
@@ -79,7 +82,7 @@ export function ProductVisual({ slug }: { slug: string }) {
           <code>
             <span className="tk-k">const</span> card = <span className="tk-k">await</span> nowcoin.cards.
             <span className="tk-f">issue</span>({'{'}
-            {'\n'}  user: <span className="tk-s">'usr_8f2k'</span>,{'\n'}  type: <span className="tk-s">'virtual'</span>
+            {'\n'} user: <span className="tk-s">'usr_8f2k'</span>,{'\n'} type: <span className="tk-s">'virtual'</span>
             {'\n'}
             {'}'})
           </code>

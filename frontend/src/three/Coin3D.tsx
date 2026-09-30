@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useFontsReady } from '../lib/hooks'
-import { getCoinFace } from './textures'
+import { useFontsReady } from '@/hooks/useFontsReady'
+import { getCoinFace } from '@/three/textures'
 
 interface Coin3DProps {
   symbol: string

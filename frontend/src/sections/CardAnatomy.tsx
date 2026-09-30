@@ -1,13 +1,26 @@
 import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
 import { useRef, useState } from 'react'
-import { useReducedMotion } from '../lib/hooks'
-import { CardAnatomyScene } from '../three/CardAnatomyScene'
-import { LazyCanvas } from '../three/LazyCanvas'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { CardAnatomyScene } from '@/three/CardAnatomyScene'
+import { LazyCanvas } from '@/three/LazyCanvas'
+import { CardFallback } from '@/components/ui/CardFallback'
 
 const LAYERS = [
-  { at: 0.1, title: 'Holographic face', body: 'A laser-etched polycarbonate skin that shifts colour as it catches the light.' },
-  { at: 0.3, title: 'EMV secure chip', body: 'Bank-grade secure element. Your card number never leaves it unencrypted.' },
-  { at: 0.5, title: 'NFC antenna', body: 'A three-turn copper coil for tap-to-pay in under 300 ms, anywhere in the world.' },
+  {
+    at: 0.1,
+    title: 'Holographic face',
+    body: 'A laser-etched polycarbonate skin that shifts colour as it catches the light.',
+  },
+  {
+    at: 0.3,
+    title: 'EMV secure chip',
+    body: 'Bank-grade secure element. Your card number never leaves it unencrypted.',
+  },
+  {
+    at: 0.5,
+    title: 'NFC antenna',
+    body: 'A three-turn copper coil for tap-to-pay in under 300 ms, anywhere in the world.',
+  },
   { at: 0.7, title: '18 g metal core', body: 'Brushed stainless steel. Heavy in the hand, impossible to forget.' },
 ]
 
@@ -51,7 +64,11 @@ export function CardAnatomy() {
               <motion.span style={{ width: bar }} />
             </div>
           </div>
-          <LazyCanvas className="anatomy-canvas" camera={{ position: [0, 0, 7], fov: 40 }}>
+          <LazyCanvas
+            className="anatomy-canvas"
+            camera={{ position: [0, 0, 7], fov: 40 }}
+            fallback={<CardFallback colors={['#6d28d9', '#0891b2']} className="is-centered" />}
+          >
             <CardAnatomyScene progress={scrollYProgress} reduced={reduced} />
           </LazyCanvas>
         </div>

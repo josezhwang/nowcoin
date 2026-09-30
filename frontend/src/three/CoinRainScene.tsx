@@ -1,9 +1,9 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { seeded } from './random'
-import { Coin3D } from './Coin3D'
-import { StudioLights } from './StudioLights'
+import { seeded } from '@/three/random'
+import { Coin3D } from '@/three/Coin3D'
+import { StudioLights } from '@/three/StudioLights'
 
 const TYPES: { symbol: string; colors: [string, string] }[] = [
   { symbol: '₿', colors: ['#fcd34d', '#d97706'] },
@@ -20,14 +20,14 @@ export function CoinRainScene({ count = 22, reduced }: { count?: number; reduced
   const coins = useMemo(() => {
     const rand = seeded(7)
     return Array.from({ length: count }, (_, i) => ({
-        type: TYPES[i % TYPES.length],
-        lane: (i % 2 ? 1 : -1) * (0.3 + rand() * 0.2),
-        y: rand(),
-        z: -rand() * 3,
-        speed: 0.5 + rand() * 0.7,
-        spin: new THREE.Vector3(rand() * 2, rand() * 3, rand()),
-        scale: 0.35 + rand() * 0.35,
-      }))
+      type: TYPES[i % TYPES.length]!,
+      lane: (i % 2 ? 1 : -1) * (0.3 + rand() * 0.2),
+      y: rand(),
+      z: -rand() * 3,
+      speed: 0.5 + rand() * 0.7,
+      spin: new THREE.Vector3(rand() * 2, rand() * 3, rand()),
+      scale: 0.35 + rand() * 0.35,
+    }))
   }, [count])
 
   useFrame((_, dt) => {

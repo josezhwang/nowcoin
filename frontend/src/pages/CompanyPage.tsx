@@ -1,14 +1,28 @@
-import { MagneticButton } from '../components/MagneticButton'
-import { Reveal, SplitWords } from '../components/Reveal'
-import { SectionHeading } from '../components/SectionHeading'
-import { tiltHandlers } from '../lib/hooks'
+import { ArrowUpRight } from 'lucide-react'
+import { PageMeta } from '@/components/layout/PageMeta'
+import { MagneticButton } from '@/components/ui/MagneticButton'
+import { Reveal, SplitWords } from '@/components/ui/Reveal'
+import { SectionHeading } from '@/components/ui/SectionHeading'
+import { tiltHandlers } from '@/lib/tilt'
 
 // Placeholder company story — replace with real milestones and team details.
 const VALUES = [
-  { title: 'Customers own their money', body: 'We design every product so that users stay in control, with clear custody choices and no hidden rehypothecation.' },
-  { title: 'Security is the product', body: 'We would rather ship later than ship something we cannot defend. Every release goes through independent review.' },
-  { title: 'Radically transparent', body: 'Reserves, fees and incidents are published openly. Trust is earned in public.' },
-  { title: 'Make it feel simple', body: 'Crypto is complex. Our job is to absorb that complexity so our customers never have to.' },
+  {
+    title: 'Customers own their money',
+    body: 'We design every product so that users stay in control, with clear custody choices and no hidden rehypothecation.',
+  },
+  {
+    title: 'Security is the product',
+    body: 'We would rather ship later than ship something we cannot defend. Every release goes through independent review.',
+  },
+  {
+    title: 'Radically transparent',
+    body: 'Reserves, fees and incidents are published openly. Trust is earned in public.',
+  },
+  {
+    title: 'Make it feel simple',
+    body: 'Crypto is complex. Our job is to absorb that complexity so our customers never have to.',
+  },
 ]
 
 const TIMELINE = [
@@ -27,11 +41,15 @@ const OPENINGS = [
   ['Compliance Lead, MiCA', 'Paris'],
 ]
 
-export function CompanyPage() {
+export default function CompanyPage() {
   return (
     <>
+      <PageMeta title="About" description="Our mission, principles and journey — and how to join the team." />
       <section className="page-hero container">
-        <div className="glow" style={{ width: 520, height: 520, background: '#6d28d9', top: -140, left: '40%', opacity: 0.35 }} />
+        <div
+          className="glow"
+          style={{ width: 520, height: 520, background: '#6d28d9', top: -140, left: '40%', opacity: 0.35 }}
+        />
         <span className="eyebrow">About Nowcoin Digital</span>
         <h1>
           <SplitWords text="We're building the" />
@@ -39,8 +57,8 @@ export function CompanyPage() {
           <SplitWords text="financial internet." className="gradient-text" delay={0.25} />
         </h1>
         <p className="page-lede">
-          Nowcoin Digital started with a simple idea: owning, spending and building with digital assets should be as easy as
-          using a bank app, and far more open.
+          Nowcoin Digital started with a simple idea: owning, spending and building with digital assets should be as
+          easy as using a bank app, and far more open.
         </p>
       </section>
 
@@ -79,13 +97,19 @@ export function CompanyPage() {
 
       <section className="section" id="careers">
         <div className="container">
-          <SectionHeading eyebrow="Careers" title="Build what's next with us" body="We're a remote-first team across 20+ countries." />
+          <SectionHeading
+            eyebrow="Careers"
+            title="Build what's next with us"
+            body="We're a remote-first team across 20+ countries."
+          />
           <div className="openings">
             {OPENINGS.map(([role, loc]) => (
               <a key={role} href="#" className="opening">
                 <span>{role}</span>
                 <span className="opening-loc">{loc}</span>
-                <span className="bento-arrow">↗</span>
+                <span className="bento-arrow" aria-hidden>
+                  <ArrowUpRight size={16} />
+                </span>
               </a>
             ))}
           </div>

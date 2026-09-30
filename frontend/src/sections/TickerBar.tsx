@@ -1,11 +1,10 @@
-import { Marquee } from '../components/Marquee'
-import { Sparkline } from '../components/Sparkline'
-import { useApi } from '../lib/api'
-import { formatPrice } from '../lib/hooks'
-import type { TickerResponse } from '../lib/types'
+import { Marquee } from '@/components/ui/Marquee'
+import { Sparkline } from '@/components/ui/Sparkline'
+import { useTickers } from '@/api/queries'
+import { formatPercent, formatPrice } from '@/lib/format'
 
 export function TickerBar() {
-  const { data } = useApi<TickerResponse>('/market/tickers', { refreshMs: 60_000 })
+  const { data } = useTickers()
 
   return (
     <div className="ticker-bar">
@@ -22,7 +21,7 @@ export function TickerBar() {
                 <span className="ticker-sym">{t.symbol}</span>
                 <span className="ticker-price">{formatPrice(t.price)}</span>
                 <span className={`ticker-change ${up ? 'up' : 'down'}`}>
-                  {up ? '▲' : '▼'} {Math.abs(t.change24h).toFixed(2)}%
+                  {up ? '▲' : '▼'} {formatPercent(t.change24h)}
                 </span>
                 <Sparkline values={t.sparkline} up={up} width={72} height={24} />
               </div>

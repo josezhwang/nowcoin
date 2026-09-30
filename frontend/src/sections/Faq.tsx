@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { SectionHeading } from '../components/SectionHeading'
-import type { HomeContent } from '../lib/types'
+import { SectionHeading } from '@/components/ui/SectionHeading'
+import type { HomeContent } from '@/api/types'
 
 export function Faq({ faqs }: { faqs: HomeContent['faqs'] }) {
   const [open, setOpen] = useState<number | null>(0)
@@ -9,7 +9,11 @@ export function Faq({ faqs }: { faqs: HomeContent['faqs'] }) {
   return (
     <section className="section faq-section" id="faq">
       <div className="container faq-grid">
-        <SectionHeading eyebrow="FAQ" title="Questions, answered." body="Can't find what you need? Our support team is online 24/7." />
+        <SectionHeading
+          eyebrow="FAQ"
+          title="Questions, answered."
+          body="Can't find what you need? Our support team is online 24/7."
+        />
         <div className="faq-list">
           {faqs.map((f, i) => {
             const isOpen = open === i

@@ -2,6 +2,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 
+// Load backend/.env when present; real environment variables still take precedence.
+try {
+  process.loadEnvFile();
+} catch {
+  // No .env file — rely on the process environment.
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');

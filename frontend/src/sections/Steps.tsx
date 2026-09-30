@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { MagneticButton } from '../components/MagneticButton'
-import { Reveal } from '../components/Reveal'
+import { MagneticButton } from '@/components/ui/MagneticButton'
+import { Reveal } from '@/components/ui/Reveal'
 
 export function Steps({ steps }: { steps: { title: string; body: string }[] }) {
   const ref = useRef<HTMLDivElement>(null)

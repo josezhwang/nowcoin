@@ -1,5 +1,5 @@
 import { Float, MeshDistortMaterial, Sparkles } from '@react-three/drei'
-import { StudioLights } from './StudioLights'
+import { StudioLights } from '@/three/StudioLights'
 
 /** Liquid-metal blob tinted with a product's accent colour. */
 export function OrbScene({ color, reduced }: { color: string; reduced: boolean }) {

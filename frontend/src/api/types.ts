@@ -50,3 +50,13 @@ export interface TickerResponse {
   updatedAt: number
   tickers: Ticker[]
 }
+
+export type ContactTopic = 'sales' | 'partnership' | 'support' | 'press' | 'other'
+
+export interface ContactPayload {
+  name: string
+  email: string
+  company?: string
+  topic: ContactTopic
+  message: string
+}

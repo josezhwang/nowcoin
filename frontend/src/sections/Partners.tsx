@@ -1,4 +1,4 @@
-import { Marquee } from '../components/Marquee'
+import { Marquee } from '@/components/ui/Marquee'
 
 // Placeholder partner wordmarks — swap for real logos.
 const PARTNERS = ['Lumen Labs', 'Kinetik', 'Stackpay', 'Orbital', 'Meridian', 'Halcyon', 'Parallax', 'Northwind']
