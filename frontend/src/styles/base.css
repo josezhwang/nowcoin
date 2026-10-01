@@ -76,8 +76,8 @@ h2,
   color: transparent;
 }
 
-h1:has(.cr),
-h2:has(.cr) {
+h1:has(.cr, .wr),
+h2:has(.cr, .wr) {
   background: none;
   color: var(--text);
 }
@@ -150,10 +150,6 @@ main:focus {
 .section {
   position: relative;
   padding-block: var(--section-y);
-}
-
-.section + .section {
-  border-top: 1px solid var(--border);
 }
 
 .section-head {

@@ -1,7 +1,97 @@
 /* ================= Hero vault (rounded slab, square hole, rising cubes) ================= */
 
+/* Materials. Dark: obsidian slab with neon-violet light. Light: pearl-white slab
+   with lavender glass cubes. The SVG gradients read these variables. */
 .vault-wrap {
-  --stage-w: clamp(640px, 100vw, 1040px);
+  --vt-top-a: #211d40;
+  --vt-top-b: #131126;
+  --vt-top-c: #0a0915;
+  --vt-wall-a: #0b0a15;
+  --vt-wall-b: #100e1e;
+  --vt-wall-c: #26224a;
+  --vt-wall-d: #1a1832;
+  --vt-well-a: #0c0a18;
+  --vt-well-b: #2e2172;
+  --vt-floor: #120e2a;
+  --vt-glow: #7c5cff;
+  --vt-grid: rgb(255 255 255 / 0.05);
+  --vt-trace: rgb(165 139 255 / 0.24);
+  --vt-rim: rgb(255 255 255 / 0.13);
+  --vt-rim-front: rgb(255 255 255 / 0.22);
+  --vt-hole: #d9ccff;
+  --vt-hole-front: #f4efff;
+  --vt-engrave: rgb(255 255 255 / 0.14);
+  --vt-node: #e6ddff;
+  --vt-underline: #8f74ff;
+
+  --vc-face-l-a: #171430;
+  --vc-face-l-b: #0c0a17;
+  --vc-face-r-a: #201c3c;
+  --vc-face-r-b: #100e1e;
+  --vc-top-a: #28244a;
+  --vc-top-b: #14121f;
+  --vc-bleed: #ab92ff;
+  --vc-bleed-strength: 0.62;
+  --vc-surge: #e2d8ff;
+  --vc-dots: rgb(255 255 255 / 0.26);
+  --vc-leds: #e4dbff;
+  --vc-label: rgb(255 255 255 / 0.55);
+  --vc-icon: #ffffff;
+  --vc-edge-glow: #a990ff;
+  --vc-edge-core: #f3eeff;
+  --vc-edge-dim: rgb(255 255 255 / 0.14);
+
+  --ray: 168 145 255;
+  --orb: 190 170 255;
+  --runner: #ffffff;
+}
+
+:root[data-theme='light'] .vault-wrap {
+  --vt-top-a: #ffffff;
+  --vt-top-b: #f5f2ff;
+  --vt-top-c: #e6e0fb;
+  --vt-wall-a: #c9c1ec;
+  --vt-wall-b: #d6cff3;
+  --vt-wall-c: #efebfd;
+  --vt-wall-d: #e2dcf8;
+  --vt-well-a: #f1edfd;
+  --vt-well-b: #b9a7ff;
+  --vt-floor: #e4dcfd;
+  --vt-glow: #9b80ff;
+  --vt-grid: rgb(90 70 200 / 0.08);
+  --vt-trace: rgb(124 92 255 / 0.32);
+  --vt-rim: rgb(120 100 220 / 0.22);
+  --vt-rim-front: rgb(255 255 255 / 1);
+  --vt-hole: #8c6dff;
+  --vt-hole-front: #6a4bf0;
+  --vt-engrave: rgb(90 70 200 / 0.22);
+  --vt-node: #7c5cff;
+  --vt-underline: #b6a3ff;
+
+  --vc-face-l-a: #ffffff;
+  --vc-face-l-b: #e9e3fd;
+  --vc-face-r-a: #f7f4ff;
+  --vc-face-r-b: #dcd3fb;
+  --vc-top-a: #ffffff;
+  --vc-top-b: #f0ebff;
+  --vc-bleed: #9b80ff;
+  --vc-bleed-strength: 0.5;
+  --vc-surge: #ffffff;
+  --vc-dots: rgb(100 80 210 / 0.28);
+  --vc-leds: #7c5cff;
+  --vc-label: rgb(80 60 170 / 0.7);
+  --vc-icon: #6a4bf0;
+  --vc-edge-glow: #c7b8ff;
+  --vc-edge-core: #8466ff;
+  --vc-edge-dim: rgb(120 100 220 / 0.25);
+
+  --ray: 150 120 255;
+  --orb: 200 170 255;
+  --runner: #7c5cff;
+}
+
+.vault-wrap {
+  --stage-w: clamp(640px, 100vw, 1180px);
   position: relative;
   z-index: 1;
   width: var(--stage-w);
@@ -13,21 +103,30 @@
   transition: translate 1s var(--ease);
 }
 
-.vault {
+/* The stage is designed at 1200×720 and scaled to fit (see useFitScale). */
+.vault-fit {
   position: relative;
-  aspect-ratio: 1040 / 660;
+  aspect-ratio: 1200 / 720;
 }
 
-/* The near corner of the slab fades into the page. A static overlay rather
-   than a mask, so the animated layers underneath stay cheap to composite. */
+.vault {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1200px;
+  height: 720px;
+  transform: scale(var(--vs, 1));
+  transform-origin: 0 0;
+}
+
+/* The near corner of the slab fades into the page (static overlay, not a mask). */
 .vault::after {
   content: '';
   position: absolute;
-  inset: 60% -2px -2px;
+  inset: 62% -2px -2px;
   z-index: 5;
   pointer-events: none;
   background: linear-gradient(180deg, transparent, var(--bg) 88%);
-  /* Fade sideways too, so it never reads as a box against the hero glow. */
   mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
   -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
 }
@@ -43,93 +142,137 @@
   will-change: transform;
 }
 
-/* Slab surface details */
+/* ---------- Slab surface ---------- */
+
 .v-grid path {
   fill: none;
-  stroke: rgb(255 255 255 / 0.045);
+  stroke: var(--vt-grid);
   stroke-width: 1;
 }
 
 .v-traces path {
   fill: none;
-  stroke: rgb(165 139 255 / 0.22);
+  stroke: var(--vt-trace);
   stroke-width: 1.4;
   stroke-linejoin: round;
 }
 
 .v-rim {
   fill: none;
-  stroke: rgb(255 255 255 / 0.12);
+  stroke: var(--vt-rim);
   stroke-width: 1.2;
 }
 
 .v-rim.is-front {
-  stroke: rgb(255 255 255 / 0.2);
+  stroke: var(--vt-rim-front);
+  stroke-width: 1.5;
+}
+
+.v-underline {
+  fill: none;
+  stroke: var(--vt-underline);
+  stroke-opacity: 0.6;
+  stroke-width: 2.5;
 }
 
 .v-engrave text {
-  fill: rgb(255 255 255 / 0.13);
+  fill: var(--vt-engrave);
   font-family: var(--font-mono);
   font-size: 0.22px;
   letter-spacing: 0.04px;
 }
 
 .v-node {
-  fill: #e6ddff;
-  filter: drop-shadow(0 0 4px #a58bff);
+  fill: var(--vt-node);
+  filter: drop-shadow(0 0 4px var(--vt-glow));
 }
 
 .v-leds path {
   fill: none;
-  stroke: rgb(165 139 255 / 0.35);
-  stroke-width: 1.2;
+  stroke: var(--vt-trace);
+  stroke-width: 1.3;
   stroke-dasharray: 2 5;
 }
 
 .v-floor-line {
   fill: none;
-  stroke: #b8a4ff;
+  stroke: var(--vt-hole);
   stroke-opacity: 0.6;
   stroke-width: 1.5;
 }
 
 .v-hole-rim {
   fill: none;
-  stroke: #cbbcff;
+  stroke: var(--vt-hole);
   stroke-width: 1.6;
   stroke-linejoin: round;
 }
 
-.v-hole-rim.glow {
-  stroke: #9d82ff;
-  stroke-width: 6;
-  opacity: 0.8;
-}
-
 .v-hole-rim.is-front {
-  stroke: #efe9ff;
+  stroke: var(--vt-hole-front);
+  stroke-width: 1.8;
 }
 
-/* Light rising out of the well, with drifting particles */
+/* ---------- Light: underglow, rim glow, column, rays ---------- */
+
+.v-underglow {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 62%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--ray) / 0.45), transparent);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.v-rimglow {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+.v-rimglow.is-front {
+  animation-delay: -1.6s;
+}
+
+.v-rimglow path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Wide translucent strokes read as glow without a blur filter. */
+.v-rimglow-wide {
+  stroke: rgb(var(--ray) / 0.22);
+  stroke-width: 16;
+}
+
+.v-rimglow-mid {
+  stroke: rgb(var(--ray) / 0.55);
+  stroke-width: 6;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
 .v-column {
   position: absolute;
   pointer-events: none;
-  background: radial-gradient(48% 70% at 50% 92%, rgb(140 112 255 / 0.32), rgb(124 92 255 / 0.1) 55%, transparent 75%);
-  animation: column-breathe 5s ease-in-out infinite;
-}
-
-@keyframes column-breathe {
-  50% {
-    opacity: 0.65;
-  }
+  background: radial-gradient(48% 70% at 50% 92%, rgb(var(--ray) / 0.34), rgb(var(--ray) / 0.1) 55%, transparent 75%);
+  animation: breathe 5s ease-in-out infinite;
 }
 
 .v-column i {
   position: absolute;
   bottom: 12%;
   border-radius: 50%;
-  background: #e8e0ff;
-  box-shadow: 0 0 8px 2px rgb(165 139 255 / 0.8);
+  background: #f1ecff;
+  box-shadow: 0 0 8px 2px rgb(var(--ray) / 0.8);
   opacity: 0;
   animation: particle-rise linear infinite;
 }
@@ -144,11 +287,131 @@
   }
   100% {
     opacity: 0;
-    transform: translateY(-340px);
+    transform: translateY(-380px);
   }
 }
 
-/* Cubes */
+/* Volumetric shafts pouring up out of the well. */
+.v-rays {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.v-rays i {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 560px;
+  translate: -50% 0;
+  transform-origin: 50% 100%;
+  rotate: var(--angle, 0deg);
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  background: linear-gradient(0deg, rgb(var(--ray) / 0.42), rgb(var(--ray) / 0.12) 45%, transparent 85%);
+  opacity: 0.35;
+  animation: ray-shimmer 4.2s ease-in-out infinite;
+}
+
+@keyframes ray-shimmer {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scaleX(0.85);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scaleX(1.1);
+  }
+}
+
+/* ---------- Light runners circling the slab edge ---------- */
+
+.v-runner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 120px;
+  height: 3px;
+  border-radius: 3px;
+  offset-rotate: auto;
+  offset-anchor: 100% 50%;
+  background: linear-gradient(90deg, transparent, rgb(var(--ray) / 0.6) 60%, var(--runner));
+  box-shadow: 0 0 14px 2px rgb(var(--ray) / 0.7);
+  animation: edge-run 9.2s linear infinite;
+}
+
+@keyframes edge-run {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+/* ---------- Sparkles and orbs ---------- */
+
+.v-spark {
+  position: absolute;
+  z-index: 6;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  animation: sparkle 3.8s ease-in-out infinite;
+}
+
+.v-spark path {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 3px rgb(var(--ray) / 1));
+}
+
+:root[data-theme='light'] .v-spark path {
+  fill: #8466ff;
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+.v-orb {
+  position: absolute;
+  z-index: 6;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / 0.75) 0%,
+    rgb(var(--orb) / 0.5) 22%,
+    rgb(var(--orb) / 0.12) 48%,
+    transparent 70%
+  );
+  animation: orb-drift 9s ease-in-out infinite;
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    opacity: 0.35;
+    translate: 0 0;
+  }
+  50% {
+    opacity: 0.9;
+    translate: 10px -18px;
+  }
+}
+
+/* ---------- Cubes ---------- */
+
 .v-cube {
   position: absolute;
   will-change: translate;
@@ -177,13 +440,14 @@
 }
 
 .v-cube-label {
-  fill: rgb(255 255 255 / 0.55);
+  fill: var(--vc-label);
   font-family: var(--font-mono);
-  font-size: 0.15px;
+  font-size: 0.14px;
 }
 
 .v-cube-icon {
-  filter: drop-shadow(0 0 0.06px #fff) drop-shadow(0 0 0.12px #b9a6ff);
+  color: var(--vc-icon);
+  filter: drop-shadow(0 0 0.06px var(--vc-icon)) drop-shadow(0 0 0.12px var(--vc-edge-glow));
 }
 
 .v-cube-badge {
@@ -192,16 +456,16 @@
 
 .v-edge-glow {
   fill: none;
-  stroke: #a990ff;
-  stroke-width: 5;
+  stroke: var(--vc-edge-glow);
+  stroke-width: 5.5;
   stroke-linecap: round;
   opacity: 0.95;
 }
 
 .v-edge-core {
   fill: none;
-  stroke: #f3eeff;
-  stroke-width: 1.5;
+  stroke: var(--vc-edge-core);
+  stroke-width: 1.6;
   stroke-linecap: round;
 }
 
@@ -215,7 +479,7 @@
 
 .v-edge-dim {
   fill: none;
-  stroke: rgb(255 255 255 / 0.14);
+  stroke: var(--vc-edge-dim);
   stroke-width: 1;
 }
 
@@ -233,8 +497,8 @@
 
 .v-edge-surge {
   fill: none;
-  stroke: #ffffff;
-  stroke-width: 2.4;
+  stroke: var(--vc-surge);
+  stroke-width: 2.6;
   stroke-linecap: round;
 }
 
@@ -256,10 +520,8 @@
   }
 }
 
-/* Lightning: each bolt is its own layer, so flickering only changes opacity. */
-/* Each animated SVG is its own layer, so a frame repaints only that small box
-   instead of the large static slab drawing underneath it. */
-.v-bolt,
+/* Trace pulses reuse .streak from hero.css; shorter dashes for the traces. Each
+   animated SVG is its own layer, so a frame repaints only that small box. */
 .v-pulse {
   position: absolute;
   overflow: visible;
@@ -267,49 +529,6 @@
   will-change: transform;
 }
 
-.v-bolt {
-  z-index: 4;
-  opacity: 0;
-  animation: bolt-flash var(--dur, 6s) steps(1) var(--delay, 0s) infinite;
-}
-
-.bolt-core {
-  fill: none;
-  stroke: #f5f1ff;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-
-/* A wide translucent stroke reads as glow without a blur filter. */
-.bolt-glow {
-  fill: none;
-  stroke: #a58bff;
-  stroke-opacity: 0.35;
-  stroke-width: 7;
-  stroke-linejoin: round;
-}
-
-@keyframes bolt-flash {
-  0%,
-  86% {
-    opacity: 0;
-  }
-  87% {
-    opacity: 1;
-  }
-  88% {
-    opacity: 0.15;
-  }
-  89% {
-    opacity: 0.95;
-  }
-  91%,
-  100% {
-    opacity: 0;
-  }
-}
-
-/* Trace pulses reuse .streak from hero.css; shorter dashes for the traces. */
 .v-pulse .streak {
   stroke-dasharray: 0.16 1.3;
   stroke-dashoffset: 0.16;
@@ -319,6 +538,13 @@
   stroke-width: 6;
 }
 
+/* ---------- Software-rendered machines: fewer moving lights ---------- */
+
+[data-lowpower] .v-orb:nth-of-type(n + 5),
+[data-lowpower] .v-column i {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .v-cube {
     animation: none;
@@ -326,9 +552,18 @@
   }
 
   .v-charge,
-  .v-bolt,
   .v-pulse,
+  .v-runner,
+  .v-spark,
   .v-column i {
     display: none;
+  }
+
+  .v-rays i,
+  .v-orb,
+  .v-rimglow,
+  .v-underglow,
+  .v-column {
+    animation: none;
   }
 }

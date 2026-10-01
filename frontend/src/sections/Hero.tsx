@@ -24,6 +24,8 @@ export function Hero() {
         <div className="hero-aura" />
         <div className="starfield" />
         <div className="hero-spotlight" />
+        <div className="hero-spotlight is-right" />
+        <div className="hero-halo" />
       </div>
 
       <motion.div
@@ -61,9 +63,12 @@ export function Hero() {
         </motion.p>
 
         <motion.div className="hero-actions" {...fade(1.15)}>
-          <ButtonLink to="/#download" size="lg" className="hero-cta">
-            <Layers size={16} aria-hidden /> Start Earning Now
-          </ButtonLink>
+          <span className="cta-wrap">
+            <span className="cta-halo" aria-hidden />
+            <ButtonLink to="/#download" size="lg" className="hero-cta">
+              <Layers size={16} aria-hidden /> Start Earning Now
+            </ButtonLink>
+          </span>
           <ButtonLink to="/products" variant="secondary" size="lg" className="hero-cta">
             Explore Products <ArrowUpRight size={16} aria-hidden />
           </ButtonLink>

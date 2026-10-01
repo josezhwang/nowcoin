@@ -5,25 +5,25 @@
  *
  * Everything is plain SVG/CSS (no WebGL), so it renders on every machine.
  */
-export const S = 56
+export const S = 62
 const COS = Math.cos(Math.PI / 6)
 const SIN = 0.5
 
-export const STAGE_W = 1040
-export const STAGE_H = 660
+export const STAGE_W = 1200
+export const STAGE_H = 720
 const OX = STAGE_W / 2
-const OY = 300
+const OY = 340
 
 /** Half-size and corner radius of the slab, half-size of the hole. */
 export const PANEL = 5
 export const RADIUS = 1.35
-export const HOLE = 2.25
+export const HOLE = 2.8
 /** Slab thickness and how far below the top surface the well floor sits. */
 export const SLAB = 0.5
-export const WELL = 1.6
+export const WELL = 2.05
 /** Cube edge length and the spacing between cube centres. */
-export const CUBE = 1.25
-export const PITCH = 1.45
+export const CUBE = 1.6
+export const PITCH = 1.85
 
 export type P3 = readonly [number, number, number]
 type Proj = (u: number, v: number, h: number) => [number, number]
@@ -190,25 +190,26 @@ export const rand = (n: number) => {
   return x - Math.floor(x)
 }
 
-/** A jagged lightning bolt between two stage points, plus one short branch. */
-export function boltPath(a: [number, number], b: [number, number], seed: number) {
-  const steps = 9
-  const [ax, ay] = a
-  const [bx, by] = b
-  const len = Math.hypot(bx - ax, by - ay)
-  const nx = -(by - ay) / len
-  const ny = (bx - ax) / len
+/** Points along the slab's outer rounded edge at height h (stage px), for light runners. */
+export function outline(half: number, r: number, h = 0, perCorner = 10) {
   const pts: [number, number][] = []
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps
-    const off = i === 0 || i === steps ? 0 : (rand(seed + i) - 0.5) * 26
-    pts.push([ax + (bx - ax) * t + nx * off, ay + (by - ay) * t + ny * off])
+  const corners: [number, number, number][] = [
+    [half - r, -half + r, -Math.PI / 2],
+    [half - r, half - r, 0],
+    [-half + r, half - r, Math.PI / 2],
+    [-half + r, -half + r, Math.PI],
+  ]
+  for (const [cu, cv, a0] of corners) {
+    for (let i = 0; i <= perCorner; i++) {
+      const a = a0 + (i / perCorner) * (Math.PI / 2)
+      pts.push(project(cu + Math.cos(a) * r, cv + Math.sin(a) * r, h))
+    }
   }
-  const main = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${fmt(x)} ${fmt(y)}`).join(' ')
-  const [sx, sy] = pts[4]!
-  const branch = `M${fmt(sx)} ${fmt(sy)} L${fmt(sx + nx * 22 + (bx - ax) * 0.08)} ${fmt(sy + ny * 22 + (by - ay) * 0.08)} L${fmt(sx + nx * 30 + (bx - ax) * 0.16)} ${fmt(sy + ny * 18 + (by - ay) * 0.16)}`
-  return `${main} ${branch}`
+  return pts
 }
+
+export const toPath = (pts: readonly (readonly [number, number])[], close = true) =>
+  pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ') + (close ? ' Z' : '')
 
 /** Pixel bounding box (with padding) of a set of stage points. */
 export function bbox(pts: readonly (readonly [number, number])[], pad = 14) {

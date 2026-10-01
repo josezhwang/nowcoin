@@ -2,22 +2,24 @@ import type { LucideIcon } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import {
   CUBE,
+  PITCH,
   S,
   STAGE_H,
   STAGE_W,
+  WELL,
   faceMatrix,
   local,
   localPlaneMatrix,
   points,
   polyline,
   project,
-  WELL,
   type P3,
 } from './geometry'
 
 /** Each cube is drawn in its own SVG, in this local box around its base centre. */
-const BOX = { x: -86, y: -138, w: 172, h: 202 }
+const BOX = { x: -114, y: -184, w: 228, h: 266 }
 const A = CUBE / 2
+const COS = Math.cos(Math.PI / 6)
 
 export interface CubeSpec {
   i: number
@@ -104,8 +106,8 @@ const TOP_BACK_EDGES = polyline(
 /** Face-plane point (s along the face, t downward from the base) → local pixels. */
 function onFace(side: 'left' | 'right', s: number, t: number): [number, number] {
   return side === 'left'
-    ? [(s - A) * Math.cos(Math.PI / 6) * S, (s + A) * 0.5 * S + t * S]
-    : [(s + A) * Math.cos(Math.PI / 6) * S, (A - s) * 0.5 * S + t * S]
+    ? [(s - A) * COS * S, (s + A) * 0.5 * S + t * S]
+    : [(s + A) * COS * S, (A - s) * 0.5 * S + t * S]
 }
 
 const facePoly = (side: 'left' | 'right', s0: number, s1: number, t0: number, t1: number) =>
@@ -116,11 +118,12 @@ const facePoly = (side: 'left' | 'right', s0: number, s1: number, t0: number, t1
 /**
  * A glowing cube standing on the well floor. It rises and sinks with a CSS
  * animation on `translate` (compositor-only), so its SVG is drawn just once.
+ * Colours come from CSS variables, so it has a dark and a light look.
  */
 export function Cube({ spec }: { spec: CubeSpec }) {
   const { i, j, icon: Icon, label, iconSide, lift, delay, accent } = spec
   const dotSide = iconSide === 'left' ? 'right' : 'left'
-  const [x, y] = project(i * 1.45, j * 1.45, -WELL)
+  const [x, y] = project(i * PITCH, j * PITCH, -WELL)
 
   const style = {
     left: `${((x + BOX.x) / STAGE_W) * 100}%`,
@@ -141,25 +144,25 @@ export function Cube({ spec }: { spec: CubeSpec }) {
 
         {/* Dot-matrix "server" panel with a few lit LEDs */}
         <polygon
-          points={facePoly(dotSide, -A + 0.1, A - 0.12, -CUBE + 0.12, -0.14)}
+          points={facePoly(dotSide, -A + 0.12, A - 0.14, -CUBE + 0.14, -0.16)}
           fill={`url(#vc-dots-${dotSide})`}
         />
-        <polygon points={facePoly(dotSide, A - 0.42, A - 0.14, -0.5, -0.18)} fill={`url(#vc-leds-${dotSide})`} />
+        <polygon points={facePoly(dotSide, A - 0.5, A - 0.16, -0.6, -0.2)} fill={`url(#vc-leds-${dotSide})`} />
 
         <polygon points={points(topFace, local)} fill="url(#vc-top)" />
         <g transform={localPlaneMatrix(CUBE)}>
-          <text x={-A + 0.1} y={-A + 0.26} className="v-cube-label">
+          <text x={-A + 0.12} y={-A + 0.3} className="v-cube-label">
             {label}
           </text>
         </g>
 
         <g transform={faceMatrix[iconSide](A)} className="v-cube-icon">
-          <Icon x={-0.25} y={-CUBE / 2 - 0.25} width={0.5} height={0.5} strokeWidth={1.7} color="#fff" />
+          <Icon x={-0.32} y={-CUBE / 2 - 0.32} width={0.64} height={0.64} strokeWidth={1.6} />
         </g>
         {accent && (
           <g transform={faceMatrix[dotSide](A)}>
-            <circle cx={0.18} cy={-CUBE / 2} r={0.21} fill="url(#vc-badge)" className="v-cube-badge" />
-            <svg x={0.05} y={-CUBE / 2 - 0.13} width={0.26} height={0.26} viewBox="0 0 24 24">
+            <circle cx={0.22} cy={-CUBE / 2} r={0.27} fill="url(#vc-badge)" className="v-cube-badge" />
+            <svg x={0.05} y={-CUBE / 2 - 0.17} width={0.34} height={0.34} viewBox="0 0 24 24">
               <path
                 d="M6.5 18V6l11 12V6"
                 fill="none"

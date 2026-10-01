@@ -1,5 +1,5 @@
 import { ArrowLeftRight, Bitcoin, Code2, CreditCard, Landmark, ShieldCheck, Store, Wallet, Zap } from 'lucide-react'
-import { useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties, type RefObject } from 'react'
 import { usePauseOffscreen } from '@/hooks/usePauseOffscreen'
 import { Cube, type CubeSpec } from './Cube'
 import {
@@ -8,6 +8,7 @@ import {
   HOLE,
   PANEL,
   RADIUS,
+  S,
   SLAB,
   STAGE_H,
   STAGE_W,
@@ -15,22 +16,21 @@ import {
   TRACES,
   WELL,
   bbox,
-  boltPath,
   boxStyle,
+  outline,
   planeMatrix,
   points,
   polyline,
   project,
   rand,
   roundedSquare,
-  S,
+  toPath,
 } from './geometry'
 
 const B = HOLE
 const SQRT3_2 = Math.cos(Math.PI / 6)
 
 // 3×3 grid, listed back-to-front (i + j ascending) so DOM order paints correctly.
-// Delays follow i + j, so the rise travels across the grid as a diagonal wave.
 const GRID: Omit<CubeSpec, 'delay' | 'lift'>[] = [
   { i: -1, j: -1, icon: Wallet, label: 'wallet()', iconSide: 'right' },
   { i: 0, j: -1, icon: Bitcoin, label: 'swap()', iconSide: 'right' },
@@ -45,12 +45,12 @@ const GRID: Omit<CubeSpec, 'delay' | 'lift'>[] = [
 
 const CUBES: CubeSpec[] = GRID.map((c, k) => ({
   ...c,
-  lift: 0.95 + rand(k + 3) * 0.55,
+  lift: 1.0 + rand(k + 3) * 0.55,
   // Spread across most of the 5.6s cycle so some cubes are always on the rise.
   delay: -((c.i + c.j + 2) / 4) * 4.4 - rand(k) * 0.5,
 }))
 
-const WALL_LAYERS = 14
+const WALL_LAYERS = 16
 
 /** Grid lines across the slab top, at every world unit. */
 const GRID_LINES = Array.from({ length: 2 * PANEL - 1 }, (_, k) => k - PANEL + 1).flatMap((k) => [
@@ -65,14 +65,14 @@ const GRID_LINES = Array.from({ length: 2 * PANEL - 1 }, (_, k) => k - PANEL + 1
 ])
 
 /** LED strips running down the visible inner walls of the well. */
-const WALL_LEDS = [-1.5, -0.5, 0.5, 1.5].flatMap((k) => [
+const WALL_LEDS = [-2, -1, 0, 1, 2].flatMap((k) => [
   polyline([
-    [-B, k, -0.25],
-    [-B, k, -WELL + 0.15],
+    [-B, k, -0.3],
+    [-B, k, -WELL + 0.2],
   ]),
   polyline([
-    [k, -B, -0.25],
-    [k, -B, -WELL + 0.15],
+    [k, -B, -0.3],
+    [k, -B, -WELL + 0.2],
   ]),
 ])
 
@@ -81,22 +81,58 @@ const frontTraces = TRACES.filter((t) => t.front)
 
 const [cx, cy] = project(0, 0, 0)
 
-const BOLTS = [
-  { a: project(-B, 0.5, 0), b: project(-0.2, 0, 2.3), seed: 11, dur: 5.3, delay: -1.2 },
-  { a: project(0.6, -B, 0), b: project(0.15, -0.2, 2.5), seed: 23, dur: 6.8, delay: -3.9 },
-  { a: project(-B, -B, 0), b: project(-0.7, -0.6, 1.9), seed: 37, dur: 7.6, delay: -5.4 },
-  { a: project(B, 0.3, 0), b: project(0.5, 0.6, 1.8), seed: 51, dur: 8.9, delay: -2.6 },
-].map((bolt) => ({ ...bolt, d: boltPath(bolt.a, bolt.b, bolt.seed), box: bbox([bolt.a, bolt.b], 40) }))
+/** Hole rim: the two far edges (behind the cubes) and the two near edges (in front). */
+const RIM_BACK = [project(-B, B, 0), project(-B, -B, 0), project(B, -B, 0)]
+const RIM_FRONT = [project(-B, B, 0), project(B, B, 0), project(B, -B, 0)]
+const RIM_BACK_BOX = bbox(RIM_BACK, 18)
+const RIM_FRONT_BOX = bbox(RIM_FRONT, 18)
 
-const PARTICLES = Array.from({ length: 12 }, (_, k) => ({
-  left: 18 + rand(k + 40) * 64,
+/** Path for the light runners circling the slab's outer edge. */
+const EDGE_PATH = toPath(outline(PANEL, RADIUS, 0))
+
+const PARTICLES = Array.from({ length: 14 }, (_, k) => ({
+  left: 16 + rand(k + 40) * 68,
   dur: 3.6 + rand(k + 60) * 3,
   delay: -rand(k + 80) * 6,
   size: 2 + Math.round(rand(k + 90) * 2),
 }))
 
+// Light shafts rising out of the well: angle (deg), width (px), delay (s).
+const RAYS = [
+  [-16, 70, 0],
+  [-8, 120, -1.4],
+  [-2, 60, -2.6],
+  [4, 140, -0.7],
+  [11, 80, -3.3],
+  [18, 56, -2],
+] as const
+
+// Floating bokeh orbs around the vault: x, y (% of stage), size (px), delay (s).
+const ORBS = [
+  [9, 30, 60, 0],
+  [18, 64, 26, -2],
+  [30, 14, 40, -4],
+  [74, 12, 34, -1],
+  [86, 40, 70, -3],
+  [80, 70, 24, -5],
+  [52, 6, 22, -2.5],
+  [4, 52, 18, -1.5],
+] as const
+
+// Twinkling four-point sparkles just above the well: x, y (% of stage), size, delay.
+const SPARKS = [
+  [40, 28, 14, 0],
+  [61, 24, 18, -1.3],
+  [50, 16, 12, -2.4],
+  [35, 40, 10, -0.6],
+  [66, 38, 12, -3.1],
+] as const
+
 /** Shared gradients, patterns and filters (also used by every cube's SVG). */
 function Defs() {
+  const stop = (offset: string, color: string, opacity?: number | string) => (
+    <stop offset={offset} style={{ stopColor: color, stopOpacity: opacity }} />
+  )
   const faceDots = (side: 'left' | 'right', id: string, r: number, color: string) => (
     <pattern
       id={id}
@@ -109,34 +145,34 @@ function Defs() {
           : `matrix(${SQRT3_2 * S} ${-0.5 * S} 0 ${S} ${(CUBE / 2) * SQRT3_2 * S} ${(CUBE / 2) * 0.5 * S})`
       }
     >
-      <circle cx="0.052" cy="0.052" r={r} fill={color} />
+      <circle cx="0.052" cy="0.052" r={r} style={{ fill: color }} />
     </pattern>
   )
   return (
     <defs>
       <linearGradient id="vt-top" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#1d1a38" />
-        <stop offset="0.5" stopColor="#121024" />
-        <stop offset="1" stopColor="#0a0915" />
+        {stop('0', 'var(--vt-top-a)')}
+        {stop('0.5', 'var(--vt-top-b)')}
+        {stop('1', 'var(--vt-top-c)')}
       </linearGradient>
-      {/* Walls: darker on the left face, lit on the right face (world-space diagonal = screen x). */}
+      {/* Walls: shaded on the left face, lit on the right face (world diagonal = screen x). */}
       <linearGradient id="vt-wall" gradientUnits="userSpaceOnUse" x1={-PANEL} y1={PANEL} x2={PANEL} y2={-PANEL}>
-        <stop offset="0" stopColor="#0b0a15" />
-        <stop offset="0.44" stopColor="#100e1e" />
-        <stop offset="0.56" stopColor="#25223f" />
-        <stop offset="1" stopColor="#1a1830" />
+        {stop('0', 'var(--vt-wall-a)')}
+        {stop('0.44', 'var(--vt-wall-b)')}
+        {stop('0.56', 'var(--vt-wall-c)')}
+        {stop('1', 'var(--vt-wall-d)')}
       </linearGradient>
       <linearGradient id="vt-well" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#0c0a18" />
-        <stop offset="1" stopColor="#2b1f6b" />
+        {stop('0', 'var(--vt-well-a)')}
+        {stop('1', 'var(--vt-well-b)')}
       </linearGradient>
       <radialGradient id="vt-floor" cx="0.5" cy="0.5" r="0.6">
-        <stop offset="0" stopColor="#7c5cff" stopOpacity="0.75" />
-        <stop offset="1" stopColor="#120e2a" stopOpacity="1" />
+        {stop('0', 'var(--vt-glow)', 0.8)}
+        {stop('1', 'var(--vt-floor)')}
       </radialGradient>
       <radialGradient id="vt-under" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stopColor="#7c5cff" stopOpacity="0.5" />
-        <stop offset="1" stopColor="#7c5cff" stopOpacity="0" />
+        {stop('0', 'var(--vt-glow)', 0.5)}
+        {stop('1', 'var(--vt-glow)', 0)}
       </radialGradient>
       <clipPath id="vt-topclip">
         <path d={TOP_FACE} transform={planeMatrix(0)} clipRule="evenodd" />
@@ -147,58 +183,54 @@ function Defs() {
       <filter id="vt-glow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="3" />
       </filter>
-      <filter id="vt-soft" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="10" />
-      </filter>
 
       {/* Cube materials (local coordinates are identical for every cube) */}
       <linearGradient id="vc-face-l" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#161329" />
-        <stop offset="1" stopColor="#0c0a17" />
+        {stop('0', 'var(--vc-face-l-a)')}
+        {stop('1', 'var(--vc-face-l-b)')}
       </linearGradient>
       <linearGradient id="vc-face-r" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#1d1a35" />
-        <stop offset="1" stopColor="#100e1e" />
+        {stop('0', 'var(--vc-face-r-a)')}
+        {stop('1', 'var(--vc-face-r-b)')}
       </linearGradient>
       <linearGradient id="vc-bleed" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0" stopColor="#ab92ff" stopOpacity="0.62" />
-        <stop offset="0.42" stopColor="#ab92ff" stopOpacity="0.08" />
-        <stop offset="1" stopColor="#ab92ff" stopOpacity="0" />
+        {stop('0', 'var(--vc-bleed)', 'var(--vc-bleed-strength)')}
+        {stop('0.42', 'var(--vc-bleed)', 0.08)}
+        {stop('1', 'var(--vc-bleed)', 0)}
       </linearGradient>
       <linearGradient id="vc-top" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#24213d" />
-        <stop offset="1" stopColor="#13111f" />
+        {stop('0', 'var(--vc-top-a)')}
+        {stop('1', 'var(--vc-top-b)')}
       </linearGradient>
       <linearGradient id="vc-surge" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0" stopColor="#d9ccff" stopOpacity="0.75" />
-        <stop offset="0.6" stopColor="#a58bff" stopOpacity="0.18" />
-        <stop offset="1" stopColor="#a58bff" stopOpacity="0" />
+        {stop('0', 'var(--vc-surge)', 0.75)}
+        {stop('0.6', 'var(--vc-bleed)', 0.18)}
+        {stop('1', 'var(--vc-bleed)', 0)}
       </linearGradient>
       <radialGradient id="vc-badge" cx="0.35" cy="0.3" r="0.8">
-        <stop offset="0" stopColor="#b59cff" />
-        <stop offset="1" stopColor="#6a4bf0" />
+        {stop('0', '#b59cff')}
+        {stop('1', '#6a4bf0')}
       </radialGradient>
-      {faceDots('left', 'vc-dots-left', 0.013, 'rgba(255,255,255,0.26)')}
-      {faceDots('right', 'vc-dots-right', 0.013, 'rgba(255,255,255,0.26)')}
-      {faceDots('left', 'vc-leds-left', 0.02, '#e4dbff')}
-      {faceDots('right', 'vc-leds-right', 0.02, '#e4dbff')}
+      {faceDots('left', 'vc-dots-left', 0.013, 'var(--vc-dots)')}
+      {faceDots('right', 'vc-dots-right', 0.013, 'var(--vc-dots)')}
+      {faceDots('left', 'vc-leds-left', 0.02, 'var(--vc-leds)')}
+      {faceDots('right', 'vc-leds-right', 0.02, 'var(--vc-leds)')}
       <filter id="vc-glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="2.6" />
+        <feGaussianBlur stdDeviation="2.8" />
       </filter>
     </defs>
   )
 }
 
-/** Everything behind the cubes: slab body, top surface, the well and its glow. */
+/** Everything behind the cubes: slab body, top surface and the well. */
 function BackLayer() {
   const wallStep = SLAB / (WALL_LAYERS - 1)
   return (
     <svg className="v-layer" viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} aria-hidden>
       <Defs />
-      {/* Violet underglow beneath the slab */}
       <ellipse
         cx={cx}
-        cy={cy + PANEL * 0.5 * S + 40}
+        cy={cy + PANEL * 0.5 * S + 50}
         rx={PANEL * 1.9 * S * 0.5}
         ry={PANEL * 0.5 * S * 0.75}
         fill="url(#vt-under)"
@@ -216,10 +248,7 @@ function BackLayer() {
       <path
         d={roundedSquare(PANEL, RADIUS)}
         transform={planeMatrix(-SLAB)}
-        fill="none"
-        stroke="#8f74ff"
-        strokeOpacity="0.55"
-        strokeWidth="2"
+        className="v-underline"
         vectorEffect="non-scaling-stroke"
         filter="url(#vt-glow)"
       />
@@ -285,29 +314,11 @@ function BackLayer() {
         ])}
         className="v-floor-line"
       />
-
-      {/* Back rim of the hole */}
-      <path
-        d={polyline([
-          [-B, B, 0],
-          [-B, -B, 0],
-          [B, -B, 0],
-        ])}
-        className="v-hole-rim glow"
-        filter="url(#vt-glow)"
-      />
-      <path
-        d={polyline([
-          [-B, B, 0],
-          [-B, -B, 0],
-          [B, -B, 0],
-        ])}
-        className="v-hole-rim"
-      />
+      <path d={toPath(RIM_BACK, false)} className="v-hole-rim" />
       {backTraces.map((t) => {
         const end = t.path[t.path.length - 1]!
         const [x, y] = project(end[0], end[1], 0)
-        return <circle key={`${x}${y}`} cx={x} cy={y} r="2.6" className="v-node" />
+        return <circle key={`${x}${y}`} cx={x} cy={y} r="2.8" className="v-node" />
       })}
     </svg>
   )
@@ -337,41 +348,42 @@ function FrontLayer() {
         />
         {/* Engraved serial text on the two front strips */}
         <g transform={planeMatrix(0)} className="v-engrave">
-          <text x={-1.9} y={3.75}>
+          <text x={-1.9} y={4.05}>
             NOWCOIN · MPC VAULT · 01
           </text>
-          <text transform="translate(3.75 1.9) rotate(-90)">SETTLEMENT LAYER · 24/7</text>
+          <text transform="translate(4.05 1.9) rotate(-90)">SETTLEMENT LAYER · 24/7</text>
         </g>
       </g>
-      <path
-        d={polyline([
-          [-B, B, 0],
-          [B, B, 0],
-          [B, -B, 0],
-        ])}
-        className="v-hole-rim glow"
-        filter="url(#vt-glow)"
-      />
-      <path
-        d={polyline([
-          [-B, B, 0],
-          [B, B, 0],
-          [B, -B, 0],
-        ])}
-        className="v-hole-rim is-front"
-      />
+      <path d={toPath(RIM_FRONT, false)} className="v-hole-rim is-front" />
       {frontTraces.map((t) => {
         const end = t.path[t.path.length - 1]!
         const [x, y] = project(end[0], end[1], 0)
-        return <circle key={`${x}${y}`} cx={x} cy={y} r="2.6" className="v-node" />
+        return <circle key={`${x}${y}`} cx={x} cy={y} r="2.8" className="v-node" />
       })}
+    </svg>
+  )
+}
+
+/** Breathing neon glow along the hole rim, split so the far edges sit behind the cubes. */
+function RimGlow({ front }: { front: boolean }) {
+  const pts = front ? RIM_FRONT : RIM_BACK
+  const box = front ? RIM_FRONT_BOX : RIM_BACK_BOX
+  return (
+    <svg
+      className={`v-rimglow${front ? ' is-front' : ''}`}
+      viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`}
+      style={boxStyle(box)}
+      aria-hidden
+    >
+      <path d={toPath(pts, false)} className="v-rimglow-wide" />
+      <path d={toPath(pts, false)} className="v-rimglow-mid" />
     </svg>
   )
 }
 
 /**
  * Light pulses racing along the engraved traces towards the hole. Each trace
- * gets its own small SVG so a frame only repaints a few hundred pixels.
+ * gets its own small SVG layer, so a frame only repaints a few hundred pixels.
  */
 function Pulses({ front }: { front: boolean }) {
   const list = front ? frontTraces : backTraces
@@ -399,59 +411,98 @@ function Pulses({ front }: { front: boolean }) {
   )
 }
 
+/** Keeps the fixed-size stage (STAGE_W × STAGE_H) scaled to its container's width. */
+function useFitScale(ref: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) el.style.setProperty('--vs', String(entry.contentRect.width / STAGE_W))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref])
+}
+
 /**
  * Hero centrepiece: a rounded slab with a square hole, from which glowing
- * cubes rise and sink in a wave. Light pulses run along engraved traces,
- * a laser sweeps each cube, and lightning crackles above the well.
+ * cubes rise and sink in a wave. Light shafts pour out of the well, pulses run
+ * along engraved traces, light runners circle the slab's edge and orbs drift
+ * in the air. Plain SVG + CSS — no WebGL — so it renders everywhere.
  */
 export function Vault() {
-  const ref = useRef<HTMLDivElement>(null)
-  usePauseOffscreen(ref)
+  const fitRef = useRef<HTMLDivElement>(null)
+  usePauseOffscreen(fitRef)
+  useFitScale(fitRef)
 
   const columnStyle = {
-    left: `${((cx - 250) / STAGE_W) * 100}%`,
-    width: `${(500 / STAGE_W) * 100}%`,
-    top: `${((cy - 470) / STAGE_H) * 100}%`,
-    height: `${(560 / STAGE_H) * 100}%`,
+    left: `${((cx - 280) / STAGE_W) * 100}%`,
+    width: `${(560 / STAGE_W) * 100}%`,
+    top: `${((cy - 520) / STAGE_H) * 100}%`,
+    height: `${(620 / STAGE_H) * 100}%`,
+  }
+  const raysStyle = {
+    left: `${(cx / STAGE_W) * 100}%`,
+    top: `${((cy + 30) / STAGE_H) * 100}%`,
   }
 
   return (
-    <div className="vault" ref={ref} aria-hidden>
-      <BackLayer />
-      <div className="v-column" style={columnStyle}>
-        {PARTICLES.map((p, k) => (
-          <i
-            key={k}
-            style={
-              {
+    <div className="vault-fit" ref={fitRef} aria-hidden>
+      <div className="vault">
+        <div className="v-underglow" />
+        <BackLayer />
+        <RimGlow front={false} />
+        <div className="v-column" style={columnStyle}>
+          {PARTICLES.map((p, k) => (
+            <i
+              key={k}
+              style={{
                 left: `${p.left}%`,
                 width: p.size,
                 height: p.size,
                 animationDuration: `${p.dur}s`,
                 animationDelay: `${p.delay}s`,
-              } as CSSProperties
-            }
+              }}
+            />
+          ))}
+        </div>
+        <Pulses front={false} />
+        {CUBES.map((c) => (
+          <Cube key={`${c.i}.${c.j}`} spec={c} />
+        ))}
+        <div className="v-rays" style={raysStyle}>
+          {RAYS.map(([angle, width, delay], k) => (
+            <i key={k} style={{ '--angle': `${angle}deg`, width, animationDelay: `${delay}s` } as CSSProperties} />
+          ))}
+        </div>
+        <FrontLayer />
+        <RimGlow front />
+        <Pulses front />
+        {[0, -4.6].map((delay) => (
+          <span
+            key={delay}
+            className="v-runner"
+            style={{ offsetPath: `path('${EDGE_PATH}')`, animationDelay: `${delay}s` }}
+          />
+        ))}
+        {SPARKS.map(([x, y, size, delay], k) => (
+          <svg
+            key={k}
+            className="v-spark"
+            viewBox="-10 -10 20 20"
+            style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, animationDelay: `${delay}s` }}
+          >
+            <path d="M0 -10 C1 -2 2 -1 10 0 C2 1 1 2 0 10 C-1 2 -2 1 -10 0 C-2 -1 -1 -2 0 -10Z" />
+          </svg>
+        ))}
+        {ORBS.map(([x, y, size, delay], k) => (
+          <i
+            key={k}
+            className="v-orb"
+            style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, animationDelay: `${delay}s` }}
           />
         ))}
       </div>
-      <Pulses front={false} />
-      {CUBES.map((c) => (
-        <Cube key={`${c.i}.${c.j}`} spec={c} />
-      ))}
-      <FrontLayer />
-      <Pulses front />
-      {BOLTS.map((b, k) => (
-        <svg
-          key={k}
-          className="v-bolt"
-          viewBox={`${b.box.x} ${b.box.y} ${b.box.w} ${b.box.h}`}
-          style={{ ...boxStyle(b.box), '--dur': `${b.dur}s`, '--delay': `${b.delay}s` } as CSSProperties}
-          aria-hidden
-        >
-          <path d={b.d} className="bolt-glow" />
-          <path d={b.d} className="bolt-core" />
-        </svg>
-      ))}
     </div>
   )
 }

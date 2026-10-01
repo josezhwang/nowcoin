@@ -63,6 +63,7 @@ export function Highlights() {
               </strong>
               <p>{h.body}</p>
               <Award className="hl-mark" size={64} strokeWidth={1} aria-hidden />
+              <span className="hl-edge" aria-hidden />
             </article>
           </Reveal>
         ))}
