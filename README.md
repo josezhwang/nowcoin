@@ -16,32 +16,49 @@ npm run setup   # install root, backend and frontend dependencies
 npm run dev     # API on http://localhost:4000 + website on http://localhost:5173
 ```
 
+### Share it with someone
+
+`npm run share` builds both apps and serves the site on port **5174**, reachable from other devices (the API stays
+private behind it, so there is no CORS to configure — leave `VITE_API_URL` unset).
+
+- **Same Wi-Fi/LAN:** open `http://<your-computer's-IP>:5174` (Windows: `ipconfig` → IPv4 Address). Allow Node.js
+  through the firewall when asked.
+- **Over the internet from a home PC:** routers block incoming connections, so use a free Cloudflare quick tunnel:
+  install [`cloudflared`](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/),
+  run `cloudflared tunnel --url http://localhost:5174` alongside `npm run share`, and send the
+  `https://….trycloudflare.com` link it prints.
+- **On a server with a public IP:** open the port in its firewall (e.g. `sudo ufw allow 5174/tcp`) and share
+  `http://<server-ip>:5174`.
+
+The site is only reachable while `npm run share` (and the tunnel) keep running.
+
 Other root scripts: `npm run build`, `npm test`, `npm run lint`, `npm run typecheck`, `npm run check` (all of them,
 as CI runs). Each app also works on its own — see `frontend/README.md` and `backend/README.md`.
 
 Configuration lives in `backend/.env` and `frontend/.env` — copy the `.env.example` files. All variables are optional:
 
-| Where    | Variable       | Default                  | Purpose                                                 |
-| -------- | -------------- | ------------------------ | ------------------------------------------------------- |
-| backend  | `PORT`         | `4000`                   | API port                                                |
-| backend  | `CORS_ORIGIN`  | `http://localhost:5173`  | Comma-separated allowed origins                         |
-| backend  | `LEADS_DIR`    | `backend/data`           | Where contact/newsletter JSONL goes                     |
-| frontend | `VITE_API_URL` | `/api`                   | API base for production builds on a different origin   |
-| frontend | `API_URL`      | `http://localhost:4000`  | Dev-server proxy target for `/api`                      |
+| Where    | Variable       | Default                 | Purpose                                                  |
+| -------- | -------------- | ----------------------- | -------------------------------------------------------- |
+| backend  | `PORT`         | `4000`                  | API port                                                 |
+| backend  | `HOST`         | `127.0.0.1`             | Interface the API binds to (private behind `/api` proxy) |
+| backend  | `CORS_ORIGIN`  | `http://localhost:5173` | Comma-separated allowed origins                          |
+| backend  | `LEADS_DIR`    | `backend/data`          | Where contact/newsletter JSONL goes                      |
+| frontend | `VITE_API_URL` | `/api`                  | API base for production builds on a different origin     |
+| frontend | `API_URL`      | `http://127.0.0.1:4000` | Dev/preview proxy target for `/api`                      |
 
 ## API
 
-| Method | Path                   | Notes                                                                 |
-| ------ | ---------------------- | --------------------------------------------------------------------- |
-| GET    | `/api/products`        | All products                                                          |
-| GET    | `/api/products/:slug`  | One product (404 if unknown)                                          |
-| GET    | `/api/cards`           | Card tiers                                                            |
-| GET    | `/api/home`            | Stats, steps, FAQs, testimonials                                      |
-| GET    | `/api/team`            | Team members (portraits come from `/images/team/<slug>.jpg`)          |
-| GET    | `/api/market/tickers`  | CoinGecko prices, cached 60 s; falls back to indicative data offline  |
-| POST   | `/api/newsletter`      | `{ email }`                                                           |
-| POST   | `/api/contact`         | `{ name, email, company?, topic, message }`                           |
-| GET    | `/api/health`          | Liveness                                                              |
+| Method | Path                  | Notes                                                                |
+| ------ | --------------------- | -------------------------------------------------------------------- |
+| GET    | `/api/products`       | All products                                                         |
+| GET    | `/api/products/:slug` | One product (404 if unknown)                                         |
+| GET    | `/api/cards`          | Card tiers                                                           |
+| GET    | `/api/home`           | Stats, steps, FAQs, testimonials                                     |
+| GET    | `/api/team`           | Team members (portraits come from `/images/team/<slug>.jpg`)         |
+| GET    | `/api/market/tickers` | CoinGecko prices, cached 60 s; falls back to indicative data offline |
+| POST   | `/api/newsletter`     | `{ email }`                                                          |
+| POST   | `/api/contact`        | `{ name, email, company?, topic, message }`                          |
+| GET    | `/api/health`         | Liveness                                                             |
 
 POST routes are validated with `class-validator` and rate-limited to 5/min per IP.
 Leads are appended to JSONL files — swap `LeadsService` for a database or CRM before launch.

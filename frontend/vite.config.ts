@@ -13,6 +13,12 @@ export default defineConfig({
       '/api': process.env.API_URL ?? 'http://127.0.0.1:4000',
     },
   },
+  preview: {
+    // `npm run share` serves the build with `vite preview`. Vite rejects unknown host
+    // names (IP addresses are always fine); this admits a Cloudflare quick tunnel
+    // (`cloudflared tunnel --url http://localhost:5174`) for sharing from a home PC.
+    allowedHosts: ['.trycloudflare.com'],
+  },
   build: {
     rollupOptions: {
       output: {
