@@ -190,6 +190,10 @@ function Defs() {
         {stop('0', 'var(--vc-top-a)')}
         {stop('1', 'var(--vc-top-b)')}
       </linearGradient>
+      <radialGradient id="vc-top-glow" cx="0.5" cy="0.5" r="0.62">
+        {stop('0', 'var(--vc-trim)', 'var(--vc-top-glow)')}
+        {stop('1', 'var(--vc-trim)', 0)}
+      </radialGradient>
       <linearGradient id="vc-surge" x1="0" y1="1" x2="0" y2="0">
         {stop('0', 'var(--vc-surge)', 0.75)}
         {stop('0.6', 'var(--vc-bleed)', 0.18)}

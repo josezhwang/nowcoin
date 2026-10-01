@@ -43,6 +43,9 @@
   --vc-edge-dim: rgb(255 255 255 / 0.14);
 
   --vc-edge-glow-a: 0.95;
+  --vc-trim: #b9a6ff;
+  --vc-top-glow: 0.24;
+  --vc-sheen: rgb(255 255 255 / 0.08);
 
   --ray: 168 145 255;
   --orb: 190 170 255;
@@ -98,6 +101,9 @@
   --vc-edge-core: #6a4bff;
   --vc-edge-dim: rgb(80 60 180 / 0.18);
   --vc-edge-glow-a: 0.5;
+  --vc-trim: #7c5cff;
+  --vc-top-glow: 0.12;
+  --vc-sheen: rgb(255 255 255 / 0.45);
 
   --ray: 124 92 255;
   --orb: 200 170 255;
@@ -494,6 +500,135 @@
   stroke-width: 1;
 }
 
+.v-cube-trim {
+  stroke: var(--vc-trim);
+  stroke-opacity: 0.7;
+  stroke-width: 1.3;
+  vector-effect: non-scaling-stroke;
+}
+
+.v-cube-sheen {
+  fill: var(--vc-sheen);
+}
+
+/* ---------- Cube light: ripple, scan, sparks ----------
+   All synced to cube-rise (same 5.6s cycle and --delay) and animating only
+   transform/opacity, so the compositor runs them without repainting. */
+
+.v-ripple,
+.v-scan,
+.v-spark {
+  position: absolute;
+  pointer-events: none;
+}
+
+.v-ripple {
+  overflow: visible;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: cube-ripple 5.6s cubic-bezier(0.2, 0.7, 0.3, 1) calc(var(--delay, 0s) + var(--rd, 0s)) infinite;
+}
+
+.v-ripple rect {
+  fill: none;
+  stroke: var(--vc-trim);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+@keyframes cube-ripple {
+  0%,
+  49% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  51% {
+    opacity: 0.95;
+  }
+  72%,
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+.v-scan {
+  transform-origin: 0 0;
+}
+
+.v-scan.is-l {
+  transform: skewY(30deg);
+}
+
+.v-scan.is-r {
+  transform: skewY(-30deg);
+}
+
+.v-scan i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgb(var(--ray) / 0.55) 50%,
+    rgb(238 232 255 / 0.85) 58%,
+    transparent
+  );
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: cube-scan 5.6s linear var(--delay, 0s) infinite;
+}
+
+@keyframes cube-scan {
+  0%,
+  47% {
+    transform: translateY(82px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  63% {
+    opacity: 0.9;
+  }
+  67%,
+  100% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+}
+
+.v-spark {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--runner);
+  box-shadow: 0 0 6px 1px rgb(var(--ray) / 0.9);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: cube-spark 5.6s ease-out calc(var(--delay, 0s) + var(--sd, 0s)) infinite;
+}
+
+@keyframes cube-spark {
+  0%,
+  50% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  53% {
+    opacity: 1;
+  }
+  82%,
+  100% {
+    transform: translate(var(--dx, 0), -96px) scale(0.35);
+    opacity: 0;
+  }
+}
+
 /* Energy surge: the faces and edges flare while the cube is at its peak. */
 .v-charge {
   position: absolute;
@@ -564,7 +699,10 @@
   .v-charge,
   .v-pulse,
   .v-runner,
-  .v-motes {
+  .v-motes,
+  .v-ripple,
+  .v-scan,
+  .v-spark {
     display: none;
   }
 
