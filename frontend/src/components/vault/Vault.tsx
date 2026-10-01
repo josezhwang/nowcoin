@@ -88,7 +88,10 @@ const RIM_BACK_BOX = bbox(RIM_BACK, 18)
 const RIM_FRONT_BOX = bbox(RIM_FRONT, 18)
 
 /** Path for the light runners circling the slab's outer edge. */
-const EDGE_PATH = toPath(outline(PANEL, RADIUS, 0))
+// Finely sampled corners so the comet bends smoothly round them.
+const EDGE_PATH = toPath(outline(PANEL, RADIUS, 0, 24))
+/** The comet circling the slab edge: a bright head and a tail of short, fading segments, each riding the path. */
+const COMET = Array.from({ length: 18 }, (_, k) => k)
 
 // Dust motes drifting up through the light: horizontal start (%), duration, delay, size, sway (px).
 const MOTES = Array.from({ length: 18 }, (_, k) => ({
@@ -469,7 +472,11 @@ export function Vault() {
         <FrontLayer />
         <RimGlow front />
         <Pulses front />
-        <span className="v-runner" style={{ offsetPath: `path('${EDGE_PATH}')` }} />
+        <div className="v-runner" style={{ '--edge': `path('${EDGE_PATH}')` } as CSSProperties}>
+          {COMET.map((k) => (
+            <i key={k} style={{ '--k': k } as CSSProperties} />
+          ))}
+        </div>
       </div>
     </div>
   )

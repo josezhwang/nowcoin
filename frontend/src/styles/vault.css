@@ -42,54 +42,79 @@
   --vc-edge-core: #f3eeff;
   --vc-edge-dim: rgb(255 255 255 / 0.14);
 
+  --vc-edge-glow-a: 0.95;
+
   --ray: 168 145 255;
   --orb: 190 170 255;
   --runner: #ffffff;
+  --under: rgb(168 145 255 / 0.45);
+  --column-a: 0.42;
+  --rim-wide: rgb(168 145 255 / 0.22);
+  --rim-wide-w: 16;
+  --rim-mid: rgb(168 145 255 / 0.55);
+  --rim-mid-w: 6;
 }
 
 :root[data-theme='light'] .vault-wrap {
+  /* Porcelain slab and frosted-white cubes. On a light page, light can't glow,
+     so depth comes from shading (lit right faces, shaded left faces, a recessed
+     well) and the violet is kept to crisp edges and small accents. */
   --vt-top-a: #ffffff;
-  --vt-top-b: #f5f2ff;
-  --vt-top-c: #e6e0fb;
-  --vt-wall-a: #c9c1ec;
-  --vt-wall-b: #d6cff3;
-  --vt-wall-c: #efebfd;
-  --vt-wall-d: #e2dcf8;
-  --vt-well-a: #f1edfd;
-  --vt-well-b: #b9a7ff;
-  --vt-floor: #e4dcfd;
-  --vt-glow: #9b80ff;
-  --vt-grid: rgb(90 70 200 / 0.08);
-  --vt-trace: rgb(124 92 255 / 0.32);
-  --vt-rim: rgb(120 100 220 / 0.22);
-  --vt-rim-front: rgb(255 255 255 / 1);
-  --vt-hole: #8c6dff;
-  --vt-hole-front: #6a4bf0;
-  --vt-engrave: rgb(90 70 200 / 0.22);
-  --vt-node: #7c5cff;
-  --vt-underline: #b6a3ff;
-  --vt-spill: 0.22;
+  --vt-top-b: #f8f7fd;
+  --vt-top-c: #ece9f7;
+  --vt-wall-a: #b9b1dc;
+  --vt-wall-b: #ccc6e8;
+  --vt-wall-c: #f2f0fa;
+  --vt-wall-d: #dfdbf0;
+  --vt-well-a: #e6e1f5;
+  --vt-well-b: #a596e3;
+  --vt-floor: #cbc1f1;
+  --vt-glow: #a58bff;
+  --vt-grid: rgb(70 50 170 / 0.07);
+  --vt-trace: rgb(98 70 230 / 0.26);
+  --vt-rim: rgb(70 50 170 / 0.2);
+  --vt-rim-front: rgb(255 255 255 / 0.95);
+  --vt-hole: #7c5cff;
+  --vt-hole-front: #5a3cf0;
+  --vt-engrave: rgb(70 50 170 / 0.3);
+  --vt-node: #6d4bff;
+  --vt-underline: #a58bff;
+  --vt-spill: 0.07;
 
-  --vc-face-l-a: #ffffff;
-  --vc-face-l-b: #e9e3fd;
-  --vc-face-r-a: #f7f4ff;
-  --vc-face-r-b: #dcd3fb;
+  --vc-face-l-a: #efecf8;
+  --vc-face-l-b: #d6cfee;
+  --vc-face-r-a: #ffffff;
+  --vc-face-r-b: #ebe8f6;
   --vc-top-a: #ffffff;
-  --vc-top-b: #f0ebff;
-  --vc-bleed: #9b80ff;
-  --vc-bleed-strength: 0.5;
-  --vc-surge: #ffffff;
-  --vc-dots: rgb(100 80 210 / 0.28);
-  --vc-leds: #7c5cff;
-  --vc-label: rgb(80 60 170 / 0.7);
-  --vc-icon: #6a4bf0;
-  --vc-edge-glow: #c7b8ff;
-  --vc-edge-core: #8466ff;
-  --vc-edge-dim: rgb(120 100 220 / 0.25);
+  --vc-top-b: #f3f1fb;
+  --vc-bleed: #8d70ff;
+  --vc-bleed-strength: 0.24;
+  --vc-surge: #a993ff;
+  --vc-dots: rgb(80 60 180 / 0.2);
+  --vc-leds: #6d4bff;
+  --vc-label: rgb(60 45 140 / 0.75);
+  --vc-icon: #5b3df5;
+  --vc-edge-glow: #b4a1ff;
+  --vc-edge-core: #6a4bff;
+  --vc-edge-dim: rgb(80 60 180 / 0.18);
+  --vc-edge-glow-a: 0.5;
 
-  --ray: 150 120 255;
+  --ray: 124 92 255;
   --orb: 200 170 255;
-  --runner: #7c5cff;
+  --runner: #6a4bff;
+  /* A soft lavender shadow grounds the slab instead of a glow under it. */
+  --under: rgb(84 64 170 / 0.2);
+  --column-a: 0.16;
+  --rim-wide: rgb(124 92 255 / 0.1);
+  --rim-wide-w: 10;
+  --rim-mid: rgb(124 92 255 / 0.38);
+  --rim-mid-w: 3;
+}
+
+/* Volumetric shafts and dust only read as light on a dark page. */
+:root[data-theme='light'] .v-shafts,
+:root[data-theme='light'] .v-motes {
+  display: none;
 }
 
 .vault-wrap {
@@ -121,16 +146,15 @@
   transform-origin: 0 0;
 }
 
-/* The near corner of the slab fades into the page (static overlay, not a mask). */
+/* The near corner of the slab fades into the page. One elliptical gradient — a
+   mask here banded into faint vertical stripes on light backgrounds. */
 .vault::after {
   content: '';
   position: absolute;
-  inset: 62% -2px -2px;
+  inset: 56% -2px -2px;
   z-index: 5;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent, var(--bg) 88%);
-  mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
+  background: radial-gradient(46% 100% at 50% 100%, var(--bg) 30%, transparent 96%);
 }
 
 .v-layer {
@@ -224,7 +248,7 @@
   top: 62%;
   height: 34%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--ray) / 0.45), transparent);
+  background: radial-gradient(closest-side, var(--under), transparent);
   animation: glow-drift 11s ease-in-out infinite;
 }
 
@@ -247,13 +271,13 @@
 
 /* Wide translucent strokes read as glow without a blur filter. */
 .v-rimglow-wide {
-  stroke: rgb(var(--ray) / 0.22);
-  stroke-width: 16;
+  stroke: var(--rim-wide);
+  stroke-width: var(--rim-wide-w);
 }
 
 .v-rimglow-mid {
-  stroke: rgb(var(--ray) / 0.55);
-  stroke-width: 6;
+  stroke: var(--rim-mid);
+  stroke-width: var(--rim-mid-w);
 }
 
 @keyframes breathe {
@@ -277,8 +301,8 @@
   position: absolute;
   pointer-events: none;
   background:
-    radial-gradient(42% 60% at 50% 96%, rgb(var(--ray) / 0.42), transparent 70%),
-    radial-gradient(60% 90% at 50% 100%, rgb(var(--ray) / 0.16), transparent 75%);
+    radial-gradient(42% 60% at 50% 96%, rgb(var(--ray) / var(--column-a)), transparent 70%),
+    radial-gradient(60% 90% at 50% 100%, rgb(var(--ray) / calc(var(--column-a) * 0.38)), transparent 75%);
   animation: glow-drift 10s ease-in-out infinite;
 }
 
@@ -332,11 +356,6 @@
   animation: mote-rise linear infinite;
 }
 
-:root[data-theme='light'] .v-motes i {
-  background: #ffffff;
-  box-shadow: 0 0 4px 1px rgb(var(--ray) / 0.9);
-}
-
 @keyframes mote-rise {
   0% {
     opacity: 0;
@@ -356,20 +375,44 @@
 
 /* ---------- Light runners circling the slab edge ---------- */
 
+/* A comet of short overlapping segments rather than one rigid bar: each piece
+   rides the path itself (and turns with it), so the tail bends smoothly round
+   the rounded corners instead of swinging off them. */
 .v-runner {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.v-runner i {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 4;
-  width: 220px;
-  height: 2px;
-  border-radius: 2px;
+  width: 14px;
+  height: calc(3.4px - var(--k) * 0.12px);
+  border-radius: 4px;
+  offset-path: var(--edge);
   offset-rotate: auto;
-  offset-anchor: 100% 50%;
-  background: linear-gradient(90deg, transparent, rgb(var(--ray) / 0.35) 55%, rgb(var(--ray) / 0.9));
-  box-shadow: 0 0 10px rgb(var(--ray) / 0.45);
-  opacity: 0.75;
+  offset-anchor: 50% 50%;
+  background: rgb(var(--ray) / 0.9);
+  box-shadow: 0 0 calc(10px - var(--k) * 0.4px) rgb(var(--ray) / 0.6);
+  opacity: calc(0.9 - var(--k) * 0.048);
+  will-change: transform;
   animation: edge-run 18s linear infinite;
+  animation-delay: calc(var(--k) * 0.06s - 6s);
+}
+
+/* The head: a bright, round spark. */
+.v-runner i:first-child {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--runner);
+  box-shadow:
+    0 0 6px 1px rgb(var(--ray) / 0.9),
+    0 0 18px 4px rgb(var(--ray) / 0.45);
+  opacity: 1;
 }
 
 @keyframes edge-run {
@@ -430,7 +473,7 @@
   stroke: var(--vc-edge-glow);
   stroke-width: 5.5;
   stroke-linecap: round;
-  opacity: 0.95;
+  opacity: var(--vc-edge-glow-a);
 }
 
 .v-edge-core {
@@ -441,7 +484,7 @@
 }
 
 .v-edge-glow.is-soft {
-  opacity: 0.35;
+  opacity: calc(var(--vc-edge-glow-a) * 0.37);
 }
 
 .v-edge-core.is-soft {
