@@ -132,6 +132,8 @@ h2 :is(em, strong):has(.ch, .wi) {
   position: absolute;
   inset: -4% -2% 0;
   width: 104%;
+  /* Bleeds past its box; without this, base.css caps it at 100% and it sits off-centre. */
+  max-width: none;
   height: 104%;
   opacity: 0;
   animation: fade-in 1.6s var(--ease) 0.05s forwards;
@@ -345,9 +347,6 @@ h2 :is(em, strong):has(.ch, .wi) {
 
 .hc-float {
   position: absolute;
-  /* Pointer parallax (values from usePointerTracking on the hero). */
-  translate: calc(var(--nx, 0) * var(--depth, 10px)) calc(var(--ny, 0) * var(--depth, 10px));
-  transition: translate 0.8s var(--ease);
 }
 
 .hc-card {
@@ -401,7 +400,6 @@ h2 :is(em, strong):has(.ch, .wi) {
 
 /* Upper-left: tilted back, rotated clockwise. */
 .hc-a {
-  --depth: 8px;
   top: 0;
   left: 26px;
   width: 190px;
@@ -416,7 +414,6 @@ h2 :is(em, strong):has(.ch, .wi) {
 
 /* Lower-left: in front. */
 .hc-b {
-  --depth: 16px;
   top: 118px;
   left: 0;
   width: 250px;
@@ -476,7 +473,6 @@ h2 :is(em, strong):has(.ch, .wi) {
 
 /* Upper-right: angled away. */
 .hc-c {
-  --depth: 8px;
   top: 0;
   right: 0;
   width: 240px;
@@ -542,7 +538,6 @@ h2 :is(em, strong):has(.ch, .wi) {
 
 /* Lower-right: in front, overlapping. */
 .hc-d {
-  --depth: 16px;
   top: 178px;
   right: 40px;
   width: 190px;

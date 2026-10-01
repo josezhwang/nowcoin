@@ -125,9 +125,6 @@
   justify-self: start;
   /* Centred even when the stage is wider than a phone screen (the hero clips the sides). */
   margin: 0 calc((100% - var(--stage-w)) / 2) calc(var(--stage-w) * -0.15);
-  /* Subtle parallax against the pointer (values from usePointerTracking on the hero). */
-  translate: calc(var(--nx, 0) * -10px) calc(var(--ny, 0) * -6px);
-  transition: translate 1s var(--ease);
 }
 
 /* The stage is designed at 1200×720 and scaled to fit (see useFitScale). */

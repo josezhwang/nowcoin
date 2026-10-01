@@ -5,7 +5,7 @@ import { useEffect } from 'react'
  * to the nearest `.spot` / `[data-pointer]` element under the cursor:
  *   --mx / --my  pointer position in px, relative to the element
  *   --nx / --ny  the same, normalised to -1…1 from the element's centre
- * CSS uses these for border spotlights, the hero grid glow and parallax.
+ * CSS uses these for border spotlights and the footer wordmark glow.
  * Mouse and pen only — touch devices keep the static styling.
  */
 export function usePointerTracking() {

@@ -1,6 +1,6 @@
 /*
- * Motion & light effects. Pointer-driven values (--mx/--my in px, --nx/--ny in
- * -1…1) come from usePointerTracking(). Everything here is decorative and is
+ * Motion & light effects. Pointer-driven values (--mx/--my in px) come from
+ * usePointerTracking(). Everything here is decorative and is
  * toned down under prefers-reduced-motion.
  */
 

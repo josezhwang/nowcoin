@@ -154,6 +154,9 @@
   position: absolute;
   inset: -17%;
   width: 134%;
+  /* Wider than the ring box on purpose; lift base.css's max-width: 100% cap,
+     which shrank it and pushed the circle off-centre. */
+  max-width: none;
   height: 134%;
   overflow: visible;
 }

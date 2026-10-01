@@ -16,7 +16,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 /** Centred header for inner pages, on a compact version of the hero backdrop. */
 export function PageHeader({ eyebrow, title, lead, children }: Props) {
   return (
-    <section className="page-header" data-pointer>
+    <section className="page-header">
       <HeroBackdrop compact />
       <div className="container page-header-inner">
         <motion.span

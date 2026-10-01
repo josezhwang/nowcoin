@@ -19,7 +19,7 @@ const fade = (delay: number, y = 14) => ({
  */
 export function Hero() {
   return (
-    <section className="hero" aria-labelledby="hero-title" data-pointer>
+    <section className="hero" aria-labelledby="hero-title">
       <div className="hero-bg" aria-hidden>
         <div className="hero-aura" />
         <div className="starfield" />
