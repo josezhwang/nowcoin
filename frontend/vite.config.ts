@@ -10,7 +10,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': process.env.API_URL ?? 'http://localhost:4000',
+      '/api': process.env.API_URL ?? 'http://127.0.0.1:4000',
     },
   },
   build: {

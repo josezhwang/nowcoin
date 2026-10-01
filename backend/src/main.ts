@@ -24,6 +24,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(process.env.PORT ?? 4000);
+  // Loopback by default: the browser reaches the API through the web server's /api
+  // proxy, so it never needs to be exposed. Set HOST=0.0.0.0 to serve it directly.
+  await app.listen(process.env.PORT ?? 4000, process.env.HOST ?? '127.0.0.1');
 }
 await bootstrap();
