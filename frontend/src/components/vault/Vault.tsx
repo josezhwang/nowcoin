@@ -45,7 +45,8 @@ const GRID: Omit<CubeSpec, 'delay' | 'lift'>[] = [
 
 const CUBES: CubeSpec[] = GRID.map((c, k) => ({
   ...c,
-  lift: 1.0 + rand(k + 3) * 0.55,
+  // Cubes rest flush with the slab and pop out by 0.75–1.3 units.
+  lift: 0.75 + rand(k + 3) * 0.55,
   // Spread across most of the 5.6s cycle so some cubes are always on the rise.
   delay: -((c.i + c.j + 2) / 4) * 4.4 - rand(k) * 0.5,
 }))
@@ -90,8 +91,10 @@ const RIM_FRONT_BOX = bbox(RIM_FRONT, 18)
 /** Path for the light runners circling the slab's outer edge. */
 // Finely sampled corners so the comet bends smoothly round them.
 const EDGE_PATH = toPath(outline(PANEL, RADIUS, 0, 24))
-/** The comet circling the slab edge: a bright head and a tail of short, fading segments, each riding the path. */
-const COMET = Array.from({ length: 18 }, (_, k) => k)
+/** A comet circling the slab edge: a bright head and a tail of short, fading segments, each riding the path. */
+const COMET = Array.from({ length: 10 }, (_, k) => k)
+/** Four comets, a quarter-lap apart. */
+const COMETS = [0, 1, 2, 3]
 
 // Dust motes drifting up through the light: horizontal start (%), duration, delay, size, sway (px).
 const MOTES = Array.from({ length: 18 }, (_, k) => ({
@@ -200,15 +203,15 @@ function Defs() {
         {stop('1', 'var(--vc-bleed)', 0)}
       </linearGradient>
       <radialGradient id="vc-badge" cx="0.35" cy="0.3" r="0.8">
-        {stop('0', '#b59cff')}
-        {stop('1', '#6a4bf0')}
+        {stop('0', 'var(--vc-badge-a)')}
+        {stop('1', 'var(--vc-badge-b)')}
       </radialGradient>
       {faceDots('left', 'vc-dots-left', 0.013, 'var(--vc-dots)')}
       {faceDots('right', 'vc-dots-right', 0.013, 'var(--vc-dots)')}
       {faceDots('left', 'vc-leds-left', 0.02, 'var(--vc-leds)')}
       {faceDots('right', 'vc-leds-right', 0.02, 'var(--vc-leds)')}
       <filter id="vc-glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="2.8" />
+        <feGaussianBlur stdDeviation="2.2" />
       </filter>
     </defs>
   )
@@ -476,11 +479,13 @@ export function Vault() {
         <FrontLayer />
         <RimGlow front />
         <Pulses front />
-        <div className="v-runner" style={{ '--edge': `path('${EDGE_PATH}')` } as CSSProperties}>
-          {COMET.map((k) => (
-            <i key={k} style={{ '--k': k } as CSSProperties} />
-          ))}
-        </div>
+        {COMETS.map((c) => (
+          <div key={c} className="v-runner" style={{ '--edge': `path('${EDGE_PATH}')`, '--c': c } as CSSProperties}>
+            {COMET.map((k) => (
+              <i key={k} style={{ '--k': k } as CSSProperties} />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   )

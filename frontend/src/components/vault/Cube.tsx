@@ -6,7 +6,6 @@ import {
   S,
   STAGE_H,
   STAGE_W,
-  WELL,
   faceMatrix,
   local,
   localPlaneMatrix,
@@ -44,7 +43,7 @@ export interface CubeSpec {
   label: string
   /** Which side face carries the icon (the other gets the dot matrix). */
   iconSide: 'left' | 'right'
-  /** Rise height in world units and the wave delay (s). */
+  /** Rise height above the slab surface in world units, and the wave delay (s). */
   lift: number
   delay: number
   /** The hero cube: a glowing badge on its second face. */
@@ -149,7 +148,8 @@ const facePoly = (side: 'left' | 'right', s0: number, s1: number, t0: number, t1
 export function Cube({ spec }: { spec: CubeSpec }) {
   const { i, j, icon: Icon, label, iconSide, lift, delay, accent } = spec
   const dotSide = iconSide === 'left' ? 'right' : 'left'
-  const [x, y] = project(i * PITCH, j * PITCH, -WELL)
+  // Resting flush with the slab: the base sits one cube-height below the surface.
+  const [x, y] = project(i * PITCH, j * PITCH, -CUBE)
 
   const style = {
     left: `${((x + BOX.x) / STAGE_W) * 100}%`,

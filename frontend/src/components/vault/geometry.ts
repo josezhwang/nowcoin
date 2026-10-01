@@ -21,9 +21,13 @@ export const HOLE = 2.8
 /** Slab thickness and how far below the top surface the well floor sits. */
 export const SLAB = 0.5
 export const WELL = 2.05
-/** Cube edge length and the spacing between cube centres. */
-export const CUBE = 1.6
-export const PITCH = 1.85
+/**
+ * Cube edge length and the spacing between cube centres. Three cubes fill the
+ * hole snugly: thin 0.06 seams between them and 0.04 to the hole walls.
+ * At rest a cube's top sits flush with the slab surface (its base at -CUBE).
+ */
+export const CUBE = 1.8
+export const PITCH = 1.86
 
 export type P3 = readonly [number, number, number]
 type Proj = (u: number, v: number, h: number) => [number, number]
