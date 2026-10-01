@@ -113,3 +113,16 @@ export const LEADS = {
   /** Insulation pad where the bridge crosses the turns. */
   crossing: { x: COIL.inset - 3, y: CHIP.y + CHIP.h + 11, w: COIL.turns * COIL.gap + 2, h: 10 },
 }
+
+/**
+ * Guilloche: interleaved sine waves, phase-shifted line to line, the
+ * fine-line security print of banknotes and premium cards.
+ */
+export const GUILLOCHE = Array.from({ length: 18 }, (_, k) => {
+  const pts: string[] = []
+  for (let x = -10; x <= CARD_W + 10; x += 6) {
+    const y = CARD_H * 0.62 + Math.sin(x / 38 + k * 0.42) * (16 + k * 1.6) + Math.sin(x / 91 - k * 0.2) * 22 - k * 6.5
+    pts.push(`${x.toFixed(0)} ${y.toFixed(1)}`)
+  }
+  return `M${pts.join(' L')}`
+}).join(' ')

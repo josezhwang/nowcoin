@@ -245,6 +245,137 @@
   outline-color: color-mix(in srgb, var(--c0) 70%, white);
 }
 
+/* Idle tour: one layer at a time lifts a little, outlined, with its label lit. */
+.cx-layer.is-tour .cx-surface,
+.cx-layer.is-tour .cx-chip {
+  outline-color: color-mix(in srgb, var(--c0) 55%, transparent);
+}
+
+.cx-layer.is-tour .cx-tag-body {
+  border-color: color-mix(in srgb, var(--c0) 65%, transparent);
+  box-shadow:
+    var(--shadow-md),
+    0 0 22px -4px color-mix(in srgb, var(--c0) 70%, transparent);
+}
+
+.cx-layer.is-tour .cx-rim {
+  opacity: 1;
+}
+
+/* Rim light: each part's edge catches the tier's light in the exploded view. */
+.cx-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--c0) 60%, transparent),
+    0 0 30px -2px color-mix(in srgb, var(--c0) 55%, transparent);
+  opacity: 0;
+  backface-visibility: hidden;
+  transition: opacity 0.6s;
+}
+
+.cx[data-view='layers'] .cx-rim {
+  opacity: 0.55;
+}
+
+/* The chip's signal: a light guide standing through the stack (like the rails),
+   with packets travelling from the chip down to the back. */
+.cx-signal,
+.cx-packet {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.cx-signal {
+  left: calc(var(--chip-x) - 1px);
+  top: var(--chip-y);
+  width: 2px;
+  height: 331px;
+  transform-origin: 0 0;
+  transform: translateZ(-126px) rotateX(90deg);
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--c0) 70%, white) 70%, #fff);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c0) 80%, transparent);
+}
+
+.cx-packet {
+  left: calc(var(--chip-x) - 36px);
+  top: calc(var(--chip-y) - 29px);
+  width: 72px;
+  height: 58px;
+  border: 1.5px solid color-mix(in srgb, var(--c0) 55%, white);
+  border-radius: 12px;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--c0) 70%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--c0) 50%, transparent);
+}
+
+.cx[data-view='layers'] .cx-signal {
+  opacity: 0.85;
+  transition-delay: 0.9s;
+}
+
+.cx[data-view='layers'] .cx-packet {
+  animation: cx-packet 3.2s cubic-bezier(0.5, 0, 0.6, 1) 1.2s infinite;
+}
+
+.cx[data-view='layers'] .cx-packet.is-late {
+  animation-delay: 2.8s;
+}
+
+@keyframes cx-packet {
+  0% {
+    transform: translateZ(205px) scale(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateZ(-126px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+/* Contactless waves rolling out of the card's NFC mark in the front view. */
+.cx-wave {
+  position: absolute;
+  left: 109px;
+  top: 89px;
+  width: 60px;
+  height: 60px;
+  border: 2.5px solid transparent;
+  border-right-color: rgb(255 255 255 / 0.85);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--c0) 80%, transparent));
+  transform: translateZ(1px) scale(0.5);
+}
+
+.cx[data-view='front'] .cx-wave {
+  animation: cx-wave 2.4s ease-out calc(var(--w) * 0.8s + 1s) infinite;
+}
+
+@keyframes cx-wave {
+  0% {
+    transform: translateZ(1px) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateZ(1px) scale(3.4);
+    opacity: 0;
+  }
+}
+
 /* ---------- Face ---------- */
 
 .cx-face {
@@ -274,8 +405,83 @@
 .cx-holo {
   position: absolute;
   inset: 0;
-  overflow: hidden;
   opacity: 0.6;
+  /* The foil shifts as the card tilts towards the pointer, like real holographic print. */
+  transform: translate3d(calc(var(--px, 0) * 24%), calc(var(--py, 0) * 10%), 0);
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ---------- Tier artwork: each card has its own face, all static CSS ---------- */
+
+.cx-art {
+  position: absolute;
+  inset: 0;
+}
+
+/* Obsidian: woven carbon fibre with an iridescent sweep. */
+[data-tier='obsidian'] .cx-art {
+  background:
+    linear-gradient(115deg, transparent 52%, rgb(150 120 255 / 0.22) 62%, rgb(90 200 255 / 0.16) 70%, transparent 80%),
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.4) 0 2px, transparent 2px 5px);
+}
+
+/* Aurora: soft curtains of polar light. */
+[data-tier='aurora'] .cx-art {
+  background:
+    linear-gradient(168deg, transparent 38%, rgb(110 231 183 / 0.55) 47%, rgb(103 232 249 / 0.35) 54%, transparent 64%),
+    linear-gradient(158deg, transparent 52%, rgb(167 243 208 / 0.35) 58%, transparent 66%),
+    radial-gradient(55% 38% at 18% 88%, rgb(52 211 153 / 0.6), transparent 70%),
+    radial-gradient(70% 42% at 58% 22%, rgb(103 232 249 / 0.45), transparent 70%),
+    radial-gradient(48% 62% at 96% 72%, rgb(129 140 248 / 0.6), transparent 70%),
+    repeating-linear-gradient(98deg, rgb(255 255 255 / 0.07) 0 1.5px, transparent 1.5px 16px);
+}
+
+/* Nebula: gas clouds and a field of stars. */
+[data-tier='nebula'] .cx-art {
+  background:
+    radial-gradient(rgb(255 255 255 / 0.9) 0.7px, transparent 1.3px) 3px 5px / 37px 29px,
+    radial-gradient(rgb(255 255 255 / 0.6) 0.6px, transparent 1.1px) 17px 11px / 23px 31px,
+    radial-gradient(rgb(255 230 255 / 0.8) 1px, transparent 1.6px) 9px 21px / 71px 53px,
+    radial-gradient(45% 55% at 72% 36%, rgb(244 114 182 / 0.55), transparent 70%),
+    radial-gradient(55% 60% at 22% 78%, rgb(139 92 246 / 0.65), transparent 70%),
+    radial-gradient(28% 34% at 88% 86%, rgb(56 189 248 / 0.4), transparent 70%);
+}
+
+/* Singularity: brushed gold bending round a black hole's event horizon. */
+[data-tier='singularity'] .cx-art {
+  /* Top to bottom: the accretion disk crossing in front of the black core, the
+     core, its photon ring, a lensing halo, then gravitational ripples. */
+  background:
+    radial-gradient(74px 6px at 76% 41%, rgb(255 252 235 / 0.95), rgb(255 186 90 / 0.7) 45%, transparent 78%),
+    radial-gradient(circle at 76% 40%, #07040b 0 23px, transparent 24px),
+    radial-gradient(
+      circle at 76% 40%,
+      transparent 0 23px,
+      #fff6d8 24.5px,
+      rgb(255 190 90 / 0.85) 27px,
+      transparent 34px
+    ),
+    radial-gradient(circle at 76% 40%, rgb(255 222 150 / 0.6) 28px, transparent 86px),
+    repeating-radial-gradient(circle at 76% 40%, transparent 0 9px, rgb(90 40 0 / 0.16) 9px 10px);
+}
+
+[data-tier='singularity'] .cx-watermark,
+[data-tier='nebula'] .cx-watermark {
+  display: none;
+}
+
+.cx-guilloche {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cx-guilloche path {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.11);
+  stroke-width: 0.7;
 }
 
 .cx-holo i {
@@ -1081,6 +1287,11 @@
 [data-lowpower] .cx[data-view='layers'] .cx-current {
   animation: none;
   opacity: 0;
+}
+
+/* Drop-shadow filters re-rasterise every frame while animating; plain arcs instead. */
+[data-lowpower] .cx-wave {
+  filter: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

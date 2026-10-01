@@ -1,5 +1,5 @@
 import { BrandMark } from '@/components/ui/BrandMark'
-import { CARD_H, CARD_W, CHIP, COIL, LEADS, coilPath } from './cardGeometry'
+import { CARD_H, CARD_W, CHIP, COIL, GUILLOCHE, LEADS, coilPath } from './cardGeometry'
 
 // The printed / machined surfaces of each card layer. Plain markup + CSS
 // (see card.css), drawn once; everything that moves is a transform.
@@ -54,7 +54,13 @@ export function ChipPlate() {
 export function FaceSurface({ name }: { name: string }) {
   return (
     <div className="cx-surface cx-face">
+      {/* Tier artwork (carbon, aurora, nebula, event horizon) — pure CSS, see card.css. */}
+      <span className="cx-art" />
       <span className="cx-brush" />
+      {/* Fine security-print linework, as on banknotes. */}
+      <svg className="cx-guilloche" viewBox={`0 0 ${CARD_W} ${CARD_H}`} aria-hidden>
+        <path d={GUILLOCHE} />
+      </svg>
       <span className="cx-holo">
         <i />
       </span>

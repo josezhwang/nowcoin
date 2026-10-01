@@ -1,8 +1,8 @@
-import { useEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { CardTier } from '@/api/types'
 import { usePauseOffscreen } from '@/hooks/usePauseOffscreen'
 import { AntennaSurface, BackSurface, ChipPlate, CoreSurface, FaceSurface } from './CardSurfaces'
-import { CARD_H, CARD_W, layerSpecs, type CardView, type LayerId } from './cardGeometry'
+import { CARD_H, CARD_W, CHIP, layerSpecs, type CardView, type LayerId } from './cardGeometry'
 
 // Design sizes of the stage; it is scaled down uniformly to fit its column.
 const WIDE = { w: 1000, h: 620 }
@@ -68,6 +68,25 @@ const RAILS: [number, number][] = [
   [16, CARD_H - 16],
 ]
 
+/** While nobody is hovering, the exploded view tours the layers one by one. */
+function useLayerTour(ref: RefObject<HTMLDivElement | null>, active: boolean, count: number) {
+  const [step, setStep] = useState(0)
+  useEffect(() => {
+    if (!active || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const id = setInterval(() => {
+      // Skip ticks while the section is scrolled away (usePauseOffscreen flags it).
+      if (!ref.current?.hasAttribute('data-paused')) setStep((s) => (s + 1) % count)
+    }, 2600)
+    return () => clearInterval(id)
+  }, [ref, active, count])
+  return active ? step : -1
+}
+
+/** Contactless waves and the chip's data signal, positioned from the card geometry. */
+const CHIP_CX = CHIP.x + CHIP.w / 2
+const CHIP_CY = CHIP.y + CHIP.h / 2
+const WAVES = [0, 1, 2]
+
 interface Props {
   tier: CardTier
   view: CardView
@@ -90,18 +109,30 @@ export function CardExplode({ tier, view, focus, onFocus }: Props) {
 
   const metal = tier.material === 'metal'
   const layers = layerSpecs(metal)
+  const tour = useLayerTour(fitRef, view === 'layers' && focus === null, layers.length)
 
   const surfaces: Record<LayerId, ReactNode> = {
     chip: <ChipPlate />,
     face: (
       <>
+        <span className="cx-rim" />
         <span className="cx-slice" />
         <FaceSurface name={tier.name} />
+        {/* Contactless waves rolling out of the card in the front view. */}
+        {WAVES.map((w) => (
+          <span key={w} className="cx-wave" style={{ '--w': w } as CSSProperties} />
+        ))}
       </>
     ),
-    antenna: <AntennaSurface />,
+    antenna: (
+      <>
+        <span className="cx-rim" />
+        <AntennaSurface />
+      </>
+    ),
     core: (
       <>
+        <span className="cx-rim" />
         {[1, 2, 3].map((n) => (
           <span key={n} className="cx-slice" style={{ '--d': n } as CSSProperties} />
         ))}
@@ -110,6 +141,7 @@ export function CardExplode({ tier, view, focus, onFocus }: Props) {
     ),
     back: (
       <>
+        <span className="cx-rim" />
         <BackSurface />
         <BackSurface className="is-under" />
       </>
@@ -120,9 +152,17 @@ export function CardExplode({ tier, view, focus, onFocus }: Props) {
     <div className="cx-fit" ref={fitRef} aria-hidden>
       <div
         className={`cx${metal ? ' is-metal' : ''}`}
+        data-tier={tier.id}
         data-view={view}
         data-focus={focus ?? undefined}
-        style={{ '--c0': tier.colors[0], '--c1': tier.colors[1] } as CSSProperties}
+        style={
+          {
+            '--c0': tier.colors[0],
+            '--c1': tier.colors[1],
+            '--chip-x': `${CHIP_CX}px`,
+            '--chip-y': `${CHIP_CY}px`,
+          } as CSSProperties
+        }
       >
         <div className="cx-floor" />
         <div className="cx-float">
@@ -134,6 +174,10 @@ export function CardExplode({ tier, view, focus, onFocus }: Props) {
                 <span key={`${x}.${y}`} className="cx-rail" style={{ left: x, top: y }} />
               ))}
               <span className="cx-scan" />
+              {/* The chip's signal: a light guide down through every layer, with packets riding it. */}
+              <span className="cx-signal" />
+              <span className="cx-packet" />
+              <span className="cx-packet is-late" />
 
               {/* Painted bottom-up: when the assembled layers are too close for the
                   compositor to depth-sort, DOM order decides — and must match. */}
@@ -141,12 +185,12 @@ export function CardExplode({ tier, view, focus, onFocus }: Props) {
                 .map((l, i) => [l, i] as const)
                 .reverse()
                 .map(([l, i]) => {
-                  const lifted = view === 'layers' && focus === l.id ? 28 : 0
+                  const lifted = view !== 'layers' ? 0 : focus === l.id ? 28 : tour === i ? 16 : 0
                   const z = (view === 'layers' ? l.exploded : l.flat) + lifted
                   return (
                     <div
                       key={l.id}
-                      className={`cx-layer is-${l.id}${focus === l.id ? ' is-focus' : ''}`}
+                      className={`cx-layer is-${l.id}${focus === l.id ? ' is-focus' : ''}${tour === i ? ' is-tour' : ''}`}
                       style={{ '--z': `${z}px`, '--i': i } as CSSProperties}
                     >
                       {surfaces[l.id]}
