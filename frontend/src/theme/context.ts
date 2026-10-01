@@ -1,9 +1,8 @@
 import { createContext } from 'react'
-import type { ScenePalette, Theme } from './theme'
+import type { Theme } from './theme'
 
 export interface ThemeContextValue {
   theme: Theme
-  palette: ScenePalette
   /** Switches theme; pass the click origin to animate a circular reveal from it. */
   toggleTheme: (origin?: { x: number; y: number }) => void
 }

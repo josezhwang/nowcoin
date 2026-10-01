@@ -3,7 +3,7 @@
 Marketing site for Nowcoin Digital and its product line (Nowcoin Wallet, Card, Exchange, Pay, Vault, Connect API).
 
 ```
-frontend/   React 19 + Vite + TypeScript, three.js via @react-three/fiber, Framer Motion, Lenis
+frontend/   React 19 + Vite + TypeScript, CSS 3D / SVG / canvas, Framer Motion, Lenis
 backend/    NestJS 12 API — site content, live market prices, contact & newsletter leads
 ```
 
@@ -51,10 +51,10 @@ Leads are appended to JSONL files — swap `LeadsService` for a database or CRM 
 - Brand, navigation, contact emails, social links: `frontend/src/config/site.ts`
 - **Images**: every slot is listed in `frontend/public/images/README.md` (paths + sizes); drop files there, no code changes
 - Marketing copy and numbers: `backend/src/content/content.data.ts` (**all figures are placeholders**)
-- Light/dark theme: CSS tokens in `frontend/src/styles/global.css`, 3D colours in `frontend/src/theme/theme.ts`
-- 3D: `frontend/src/three/` — the interactive card and the network globe (real Natural Earth land mask in `landMask.ts`); both are code-split and load only when scrolled into view, with CSS fallbacks when WebGL is unavailable
+- Light/dark theme: CSS tokens in `frontend/src/styles/tokens.css`
+- 3D without WebGL: the hero vault (`frontend/src/components/vault/`), the layered Nowcoin Card with its exploded view (`frontend/src/components/card/`) and the dotted planet (`frontend/src/components/ui/DotSphere.tsx`, real Natural Earth land mask in `lib/landMask.ts`)
 - Page sections: `frontend/src/sections/`, pages: `frontend/src/pages/`
-- Design tokens (colours, fonts, radii): top of `frontend/src/styles/global.css`
+- Design tokens (colours, fonts, radii): `frontend/src/styles/tokens.css`
 
 ## Quality
 

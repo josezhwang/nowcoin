@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { ThemeContext, type ThemeContextValue } from './context'
-import { getInitialTheme, persistTheme, scenePalettes, THEME_STORAGE_KEY, type Theme } from './theme'
+import { getInitialTheme, persistTheme, THEME_STORAGE_KEY, type Theme } from './theme'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
@@ -55,6 +55,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [theme],
   )
 
-  const value = useMemo(() => ({ theme, palette: scenePalettes[theme], toggleTheme }), [theme, toggleTheme])
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

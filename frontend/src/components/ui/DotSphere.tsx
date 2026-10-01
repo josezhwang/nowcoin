@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { isLand, toVec } from '@/lib/geo'
 import { isSoftwareRenderer, supportsWebGL } from '@/lib/webgl'
-import { HUBS, ROUTES } from '@/three/globeData'
+import { HUBS, ROUTES } from '@/lib/globeData'
 
 /** Pink → violet → blue across the sphere, like the reference. */
 const PALETTE = [

@@ -7,7 +7,7 @@ import { DotSphere } from '@/components/ui/DotSphere'
 import { Reveal } from '@/components/ui/Reveal'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePauseOffscreen } from '@/hooks/usePauseOffscreen'
-import { ROUTES } from '@/three/globeData'
+import { ROUTES } from '@/lib/globeData'
 
 const ASSETS = ['USDC', 'EUR', 'USD', 'BTC', 'ETH', 'GBP'] as const
 

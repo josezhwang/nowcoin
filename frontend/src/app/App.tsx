@@ -19,7 +19,6 @@ import TeamPage from '@/pages/TeamPage'
 import { AppProviders } from './providers'
 
 // Pages are small and imported eagerly so navigation never shows a loading state.
-// Only the three.js scenes (card, globe) are split out and loaded on demand.
 
 function CrashScreen() {
   return (
