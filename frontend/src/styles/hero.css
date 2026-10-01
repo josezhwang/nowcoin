@@ -253,28 +253,6 @@ h2 :is(em, strong):has(.ch, .wi) {
     radial-gradient(26% 30% at 88% 38%, rgb(168 85 247 / 0.12), transparent 70%);
 }
 
-.hero-bg .hero-spotlight {
-  left: 26%;
-  width: 30%;
-  animation:
-    fade-in 1.4s var(--ease) 1.3s forwards,
-    spot-sway 9s ease-in-out 2.7s infinite;
-}
-
-/* A second, mirrored stage light; together they cross over the vault. */
-.hero-bg .hero-spotlight.is-right {
-  left: auto;
-  right: 26%;
-  transform: rotate(16deg);
-  animation-delay: 1.5s, 3.2s;
-}
-
-@keyframes spot-sway {
-  50% {
-    opacity: 0.55;
-  }
-}
-
 /* Soft ring of light behind the vault's hole. */
 .hero-halo {
   position: absolute;
@@ -284,8 +262,7 @@ h2 :is(em, strong):has(.ch, .wi) {
   aspect-ratio: 1.8;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(124 92 255 / 0.3), rgb(124 92 255 / 0.08) 60%, transparent);
-  animation: breathe 6s ease-in-out infinite;
+  background: radial-gradient(closest-side, rgb(124 92 255 / 0.24), rgb(124 92 255 / 0.06) 60%, transparent);
 }
 
 /* Light theme: a pastel aurora (lavender, pink, sky) instead of the night glow. */

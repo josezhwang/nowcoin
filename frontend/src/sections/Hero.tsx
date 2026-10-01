@@ -23,8 +23,6 @@ export function Hero() {
       <div className="hero-bg" aria-hidden>
         <div className="hero-aura" />
         <div className="starfield" />
-        <div className="hero-spotlight" />
-        <div className="hero-spotlight is-right" />
         <div className="hero-halo" />
       </div>
 

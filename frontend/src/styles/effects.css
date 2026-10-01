@@ -175,13 +175,8 @@
 
 /* Software-rendered machines: keep the hero cubes, lightning and lasers, drop minor loops. */
 [data-lowpower] .starfield,
-[data-lowpower] .v-column i,
 [data-lowpower] .hc-card,
 [data-lowpower] .v-column,
 [data-lowpower] .global-token {
   animation: none !important;
-}
-
-[data-lowpower] .v-column i {
-  display: none;
 }

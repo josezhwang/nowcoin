@@ -90,42 +90,21 @@ const RIM_FRONT_BOX = bbox(RIM_FRONT, 18)
 /** Path for the light runners circling the slab's outer edge. */
 const EDGE_PATH = toPath(outline(PANEL, RADIUS, 0))
 
-const PARTICLES = Array.from({ length: 14 }, (_, k) => ({
-  left: 16 + rand(k + 40) * 68,
-  dur: 3.6 + rand(k + 60) * 3,
-  delay: -rand(k + 80) * 6,
-  size: 2 + Math.round(rand(k + 90) * 2),
+// Dust motes drifting up through the light: horizontal start (%), duration, delay, size, sway (px).
+const MOTES = Array.from({ length: 18 }, (_, k) => ({
+  left: 22 + rand(k + 40) * 56,
+  dur: 7 + rand(k + 60) * 6,
+  delay: -rand(k + 80) * 12,
+  size: 1 + Math.round(rand(k + 90) * 1.5),
+  sway: (rand(k + 100) - 0.5) * 40,
 }))
 
-// Light shafts rising out of the well: angle (deg), width (px), delay (s).
-const RAYS = [
-  [-16, 70, 0],
-  [-8, 120, -1.4],
-  [-2, 60, -2.6],
-  [4, 140, -0.7],
-  [11, 80, -3.3],
-  [18, 56, -2],
-] as const
-
-// Floating bokeh orbs around the vault: x, y (% of stage), size (px), delay (s).
-const ORBS = [
-  [9, 30, 60, 0],
-  [18, 64, 26, -2],
-  [30, 14, 40, -4],
-  [74, 12, 34, -1],
-  [86, 40, 70, -3],
-  [80, 70, 24, -5],
-  [52, 6, 22, -2.5],
-  [4, 52, 18, -1.5],
-] as const
-
-// Twinkling four-point sparkles just above the well: x, y (% of stage), size, delay.
-const SPARKS = [
-  [40, 28, 14, 0],
-  [61, 24, 18, -1.3],
-  [50, 16, 12, -2.4],
-  [35, 40, 10, -0.6],
-  [66, 38, 12, -3.1],
+// Soft light shafts escaping the well: angle (deg), width (px), drift delay (s).
+// Wide and feathered on both sides so they read as volumetric light, not stripes.
+const SHAFTS = [
+  [-9, 230, 0],
+  [3, 300, -5],
+  [12, 200, -9],
 ] as const
 
 /** Shared gradients, patterns and filters (also used by every cube's SVG). */
@@ -169,6 +148,12 @@ function Defs() {
       <radialGradient id="vt-floor" cx="0.5" cy="0.5" r="0.6">
         {stop('0', 'var(--vt-glow)', 0.8)}
         {stop('1', 'var(--vt-floor)')}
+      </radialGradient>
+      {/* Light from the well spilling onto the slab surface, falling off with distance. */}
+      <radialGradient id="vt-spill" gradientUnits="userSpaceOnUse" cx="0" cy="0" r={PANEL * 0.95}>
+        {stop('0.5', 'var(--vt-glow)', 'var(--vt-spill)')}
+        {stop('0.75', 'var(--vt-glow)', 'calc(var(--vt-spill) * 0.35)')}
+        {stop('1', 'var(--vt-glow)', 0)}
       </radialGradient>
       <radialGradient id="vt-under" cx="0.5" cy="0.5" r="0.5">
         {stop('0', 'var(--vt-glow)', 0.5)}
@@ -255,6 +240,7 @@ function BackLayer() {
 
       {/* Top surface */}
       <path d={TOP_FACE} transform={planeMatrix(0)} fillRule="evenodd" fill="url(#vt-top)" />
+      <path d={TOP_FACE} transform={planeMatrix(0)} fillRule="evenodd" fill="url(#vt-spill)" />
       <g clipPath="url(#vt-topclip)" className="v-grid">
         {GRID_LINES.map((d) => (
           <path key={d} d={d} />
@@ -330,6 +316,7 @@ function FrontLayer() {
     <svg className="v-layer" viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} aria-hidden>
       <g clipPath="url(#vt-frontclip)">
         <path d={TOP_FACE} transform={planeMatrix(0)} fillRule="evenodd" fill="url(#vt-top)" />
+        <path d={TOP_FACE} transform={planeMatrix(0)} fillRule="evenodd" fill="url(#vt-spill)" />
         <g clipPath="url(#vt-topclip)" className="v-grid">
           {GRID_LINES.map((d) => (
             <path key={d} d={d} />
@@ -427,8 +414,8 @@ function useFitScale(ref: RefObject<HTMLDivElement | null>) {
 /**
  * Hero centrepiece: a rounded slab with a square hole, from which glowing
  * cubes rise and sink in a wave. Light shafts pour out of the well, pulses run
- * along engraved traces, light runners circle the slab's edge and orbs drift
- * in the air. Plain SVG + CSS — no WebGL — so it renders everywhere.
+ * along engraved traces, a faint highlight travels the slab's edge and dust
+ * drifts through the light. Plain SVG + CSS — no WebGL — so it renders everywhere.
  */
 export function Vault() {
   const fitRef = useRef<HTMLDivElement>(null)
@@ -452,56 +439,37 @@ export function Vault() {
         <div className="v-underglow" />
         <BackLayer />
         <RimGlow front={false} />
-        <div className="v-column" style={columnStyle}>
-          {PARTICLES.map((p, k) => (
-            <i
-              key={k}
-              style={{
-                left: `${p.left}%`,
-                width: p.size,
-                height: p.size,
-                animationDuration: `${p.dur}s`,
-                animationDelay: `${p.delay}s`,
-              }}
-            />
-          ))}
-        </div>
+        <div className="v-column" style={columnStyle} />
         <Pulses front={false} />
         {CUBES.map((c) => (
           <Cube key={`${c.i}.${c.j}`} spec={c} />
         ))}
-        <div className="v-rays" style={raysStyle}>
-          {RAYS.map(([angle, width, delay], k) => (
+        <div className="v-shafts" style={raysStyle}>
+          {SHAFTS.map(([angle, width, delay], k) => (
             <i key={k} style={{ '--angle': `${angle}deg`, width, animationDelay: `${delay}s` } as CSSProperties} />
+          ))}
+        </div>
+        <div className="v-motes" style={columnStyle}>
+          {MOTES.map((m, k) => (
+            <i
+              key={k}
+              style={
+                {
+                  left: `${m.left}%`,
+                  width: m.size,
+                  height: m.size,
+                  '--sway': `${m.sway}px`,
+                  animationDuration: `${m.dur}s`,
+                  animationDelay: `${m.delay}s`,
+                } as CSSProperties
+              }
+            />
           ))}
         </div>
         <FrontLayer />
         <RimGlow front />
         <Pulses front />
-        {[0, -4.6].map((delay) => (
-          <span
-            key={delay}
-            className="v-runner"
-            style={{ offsetPath: `path('${EDGE_PATH}')`, animationDelay: `${delay}s` }}
-          />
-        ))}
-        {SPARKS.map(([x, y, size, delay], k) => (
-          <svg
-            key={k}
-            className="v-spark"
-            viewBox="-10 -10 20 20"
-            style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, animationDelay: `${delay}s` }}
-          >
-            <path d="M0 -10 C1 -2 2 -1 10 0 C2 1 1 2 0 10 C-1 2 -2 1 -10 0 C-2 -1 -1 -2 0 -10Z" />
-          </svg>
-        ))}
-        {ORBS.map(([x, y, size, delay], k) => (
-          <i
-            key={k}
-            className="v-orb"
-            style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, animationDelay: `${delay}s` }}
-          />
-        ))}
+        <span className="v-runner" style={{ offsetPath: `path('${EDGE_PATH}')` }} />
       </div>
     </div>
   )

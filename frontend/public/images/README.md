@@ -4,6 +4,8 @@ Drop files here using the exact paths below — the site picks them up automatic
 Until a file exists, its slot shows a dashed placeholder; in `npm run dev` the placeholder also prints the
 expected path and size. All paths are defined in `src/config/images.ts`.
 
+Need artwork? `PROMPTS.md` in this folder has ready-to-paste ChatGPT prompts for every slot.
+
 Tips: export at 2× the listed size for sharp screens is fine; use **PNG/WebP with transparency** for icons,
 logos and 3D renders, and **JPG/WebP** for photos and screenshots.
 

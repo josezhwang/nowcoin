@@ -23,6 +23,7 @@
   --vt-engrave: rgb(255 255 255 / 0.14);
   --vt-node: #e6ddff;
   --vt-underline: #8f74ff;
+  --vt-spill: 0.3;
 
   --vc-face-l-a: #171430;
   --vc-face-l-b: #0c0a17;
@@ -67,6 +68,7 @@
   --vt-engrave: rgb(90 70 200 / 0.22);
   --vt-node: #7c5cff;
   --vt-underline: #b6a3ff;
+  --vt-spill: 0.22;
 
   --vc-face-l-a: #ffffff;
   --vc-face-l-b: #e9e3fd;
@@ -223,18 +225,18 @@
   height: 34%;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgb(var(--ray) / 0.45), transparent);
-  animation: breathe 6s ease-in-out infinite;
+  animation: glow-drift 11s ease-in-out infinite;
 }
 
 .v-rimglow {
   position: absolute;
   overflow: visible;
   pointer-events: none;
-  animation: breathe 3.2s ease-in-out infinite;
+  animation: glow-drift 9s ease-in-out infinite;
 }
 
 .v-rimglow.is-front {
-  animation-delay: -1.6s;
+  animation-delay: -4.5s;
 }
 
 .v-rimglow path {
@@ -260,68 +262,95 @@
   }
 }
 
+/* A slow, shallow intensity drift — reads as living light rather than a pulse. */
+@keyframes glow-drift {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
 .v-column {
   position: absolute;
   pointer-events: none;
-  background: radial-gradient(48% 70% at 50% 92%, rgb(var(--ray) / 0.34), rgb(var(--ray) / 0.1) 55%, transparent 75%);
-  animation: breathe 5s ease-in-out infinite;
+  background:
+    radial-gradient(42% 60% at 50% 96%, rgb(var(--ray) / 0.42), transparent 70%),
+    radial-gradient(60% 90% at 50% 100%, rgb(var(--ray) / 0.16), transparent 75%);
+  animation: glow-drift 10s ease-in-out infinite;
 }
 
-.v-column i {
-  position: absolute;
-  bottom: 12%;
-  border-radius: 50%;
-  background: #f1ecff;
-  box-shadow: 0 0 8px 2px rgb(var(--ray) / 0.8);
-  opacity: 0;
-  animation: particle-rise linear infinite;
-}
-
-@keyframes particle-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(0);
-  }
-  15% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-380px);
-  }
-}
-
-/* Volumetric shafts pouring up out of the well. */
-.v-rays {
+/* Feathered shafts of light escaping the well. Both edges and the top fade out,
+   so they read as volumetric light. They only drift in intensity, slowly. */
+.v-shafts {
   position: absolute;
   width: 0;
   height: 0;
   pointer-events: none;
 }
 
-.v-rays i {
+.v-shafts i {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 560px;
+  height: 620px;
   translate: -50% 0;
   transform-origin: 50% 100%;
   rotate: var(--angle, 0deg);
-  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
-  background: linear-gradient(0deg, rgb(var(--ray) / 0.42), rgb(var(--ray) / 0.12) 45%, transparent 85%);
-  opacity: 0.35;
-  animation: ray-shimmer 4.2s ease-in-out infinite;
+  background: linear-gradient(0deg, rgb(var(--ray) / 0.3), rgb(var(--ray) / 0.1) 40%, transparent 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  opacity: 0.6;
+  animation: shaft-drift 14s ease-in-out infinite;
 }
 
-@keyframes ray-shimmer {
+@keyframes shaft-drift {
   0%,
   100% {
-    opacity: 0.25;
-    transform: scaleX(0.85);
+    opacity: 0.45;
   }
   50% {
     opacity: 0.85;
-    transform: scaleX(1.1);
+  }
+}
+
+/* Dust motes rising slowly through the light, swaying a little. */
+.v-motes {
+  position: absolute;
+  pointer-events: none;
+}
+
+.v-motes i {
+  position: absolute;
+  bottom: 10%;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 0 4px 1px rgb(var(--ray) / 0.6);
+  opacity: 0;
+  animation: mote-rise linear infinite;
+}
+
+:root[data-theme='light'] .v-motes i {
+  background: #ffffff;
+  box-shadow: 0 0 4px 1px rgb(var(--ray) / 0.9);
+}
+
+@keyframes mote-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  20% {
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(var(--sway, 0), -260px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -420px);
   }
 }
 
@@ -332,14 +361,15 @@
   left: 0;
   top: 0;
   z-index: 4;
-  width: 120px;
-  height: 3px;
-  border-radius: 3px;
+  width: 220px;
+  height: 2px;
+  border-radius: 2px;
   offset-rotate: auto;
   offset-anchor: 100% 50%;
-  background: linear-gradient(90deg, transparent, rgb(var(--ray) / 0.6) 60%, var(--runner));
-  box-shadow: 0 0 14px 2px rgb(var(--ray) / 0.7);
-  animation: edge-run 9.2s linear infinite;
+  background: linear-gradient(90deg, transparent, rgb(var(--ray) / 0.35) 55%, rgb(var(--ray) / 0.9));
+  box-shadow: 0 0 10px rgb(var(--ray) / 0.45);
+  opacity: 0.75;
+  animation: edge-run 18s linear infinite;
 }
 
 @keyframes edge-run {
@@ -348,65 +378,6 @@
   }
   to {
     offset-distance: 100%;
-  }
-}
-
-/* ---------- Sparkles and orbs ---------- */
-
-.v-spark {
-  position: absolute;
-  z-index: 6;
-  overflow: visible;
-  pointer-events: none;
-  opacity: 0;
-  animation: sparkle 3.8s ease-in-out infinite;
-}
-
-.v-spark path {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 3px rgb(var(--ray) / 1));
-}
-
-:root[data-theme='light'] .v-spark path {
-  fill: #8466ff;
-}
-
-@keyframes sparkle {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.3) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1) rotate(45deg);
-  }
-}
-
-.v-orb {
-  position: absolute;
-  z-index: 6;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgb(255 255 255 / 0.75) 0%,
-    rgb(var(--orb) / 0.5) 22%,
-    rgb(var(--orb) / 0.12) 48%,
-    transparent 70%
-  );
-  animation: orb-drift 9s ease-in-out infinite;
-}
-
-@keyframes orb-drift {
-  0%,
-  100% {
-    opacity: 0.35;
-    translate: 0 0;
-  }
-  50% {
-    opacity: 0.9;
-    translate: 10px -18px;
   }
 }
 
@@ -540,8 +511,7 @@
 
 /* ---------- Software-rendered machines: fewer moving lights ---------- */
 
-[data-lowpower] .v-orb:nth-of-type(n + 5),
-[data-lowpower] .v-column i {
+[data-lowpower] .v-motes i:nth-child(n + 9) {
   display: none;
 }
 
@@ -554,13 +524,11 @@
   .v-charge,
   .v-pulse,
   .v-runner,
-  .v-spark,
-  .v-column i {
+  .v-motes {
     display: none;
   }
 
-  .v-rays i,
-  .v-orb,
+  .v-shafts i,
   .v-rimglow,
   .v-underglow,
   .v-column {
