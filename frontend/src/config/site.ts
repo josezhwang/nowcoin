@@ -52,8 +52,8 @@ export const footerColumns = [
     title: 'Developers',
     links: [
       { label: 'Connect API', to: '/products/api' },
-      { label: 'Documentation', to: '/#developers' },
-      { label: 'Status', to: '/#developers' },
+      { label: 'Documentation', to: '/products/api' },
+      { label: 'Status', to: '/contact' },
     ],
   },
   {
@@ -66,6 +66,3 @@ export const footerColumns = [
     ],
   },
 ] as const
-
-// Placeholder: list only certifications the company actually holds.
-export const complianceBadges = ['SOC 2 Type II', 'ISO/IEC 27001', 'PCI DSS Level 1', 'Proof of Reserves'] as const

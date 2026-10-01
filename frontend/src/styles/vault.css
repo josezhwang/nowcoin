@@ -1,0 +1,334 @@
+/* ================= Hero vault (rounded slab, square hole, rising cubes) ================= */
+
+.vault-wrap {
+  --stage-w: clamp(640px, 100vw, 1040px);
+  position: relative;
+  z-index: 1;
+  width: var(--stage-w);
+  justify-self: start;
+  /* Centred even when the stage is wider than a phone screen (the hero clips the sides). */
+  margin: 0 calc((100% - var(--stage-w)) / 2) calc(var(--stage-w) * -0.15);
+  /* Subtle parallax against the pointer (values from usePointerTracking on the hero). */
+  translate: calc(var(--nx, 0) * -10px) calc(var(--ny, 0) * -6px);
+  transition: translate 1s var(--ease);
+}
+
+.vault {
+  position: relative;
+  aspect-ratio: 1040 / 660;
+}
+
+/* The near corner of the slab fades into the page. A static overlay rather
+   than a mask, so the animated layers underneath stay cheap to composite. */
+.vault::after {
+  content: '';
+  position: absolute;
+  inset: 60% -2px -2px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--bg) 88%);
+  /* Fade sideways too, so it never reads as a box against the hero glow. */
+  mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 70%, transparent 96%);
+}
+
+.v-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  /* Own compositing layer: drawn once, never re-rastered by the animations around it. */
+  will-change: transform;
+}
+
+/* Slab surface details */
+.v-grid path {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.045);
+  stroke-width: 1;
+}
+
+.v-traces path {
+  fill: none;
+  stroke: rgb(165 139 255 / 0.22);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.v-rim {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.12);
+  stroke-width: 1.2;
+}
+
+.v-rim.is-front {
+  stroke: rgb(255 255 255 / 0.2);
+}
+
+.v-engrave text {
+  fill: rgb(255 255 255 / 0.13);
+  font-family: var(--font-mono);
+  font-size: 0.22px;
+  letter-spacing: 0.04px;
+}
+
+.v-node {
+  fill: #e6ddff;
+  filter: drop-shadow(0 0 4px #a58bff);
+}
+
+.v-leds path {
+  fill: none;
+  stroke: rgb(165 139 255 / 0.35);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 5;
+}
+
+.v-floor-line {
+  fill: none;
+  stroke: #b8a4ff;
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+}
+
+.v-hole-rim {
+  fill: none;
+  stroke: #cbbcff;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.v-hole-rim.glow {
+  stroke: #9d82ff;
+  stroke-width: 6;
+  opacity: 0.8;
+}
+
+.v-hole-rim.is-front {
+  stroke: #efe9ff;
+}
+
+/* Light rising out of the well, with drifting particles */
+.v-column {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(48% 70% at 50% 92%, rgb(140 112 255 / 0.32), rgb(124 92 255 / 0.1) 55%, transparent 75%);
+  animation: column-breathe 5s ease-in-out infinite;
+}
+
+@keyframes column-breathe {
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.v-column i {
+  position: absolute;
+  bottom: 12%;
+  border-radius: 50%;
+  background: #e8e0ff;
+  box-shadow: 0 0 8px 2px rgb(165 139 255 / 0.8);
+  opacity: 0;
+  animation: particle-rise linear infinite;
+}
+
+@keyframes particle-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-340px);
+  }
+}
+
+/* Cubes */
+.v-cube {
+  position: absolute;
+  will-change: translate;
+  animation: cube-rise 5.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.v-cube > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes cube-rise {
+  0%,
+  12%,
+  100% {
+    translate: 0 0;
+  }
+  50%,
+  62% {
+    translate: 0 var(--lift);
+  }
+}
+
+.v-cube-label {
+  fill: rgb(255 255 255 / 0.55);
+  font-family: var(--font-mono);
+  font-size: 0.15px;
+}
+
+.v-cube-icon {
+  filter: drop-shadow(0 0 0.06px #fff) drop-shadow(0 0 0.12px #b9a6ff);
+}
+
+.v-cube-badge {
+  filter: drop-shadow(0 0 0.12px #a58bff);
+}
+
+.v-edge-glow {
+  fill: none;
+  stroke: #a990ff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.95;
+}
+
+.v-edge-core {
+  fill: none;
+  stroke: #f3eeff;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.v-edge-glow.is-soft {
+  opacity: 0.35;
+}
+
+.v-edge-core.is-soft {
+  stroke-opacity: 0.45;
+}
+
+.v-edge-dim {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.14);
+  stroke-width: 1;
+}
+
+/* Energy surge: the faces and edges flare while the cube is at its peak. */
+.v-charge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0;
+  animation: cube-charge 5.6s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.v-edge-surge {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+@keyframes cube-charge {
+  0%,
+  38%,
+  78%,
+  100% {
+    opacity: 0;
+  }
+  54% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.35;
+  }
+  62% {
+    opacity: 0.9;
+  }
+}
+
+/* Lightning: each bolt is its own layer, so flickering only changes opacity. */
+/* Each animated SVG is its own layer, so a frame repaints only that small box
+   instead of the large static slab drawing underneath it. */
+.v-bolt,
+.v-pulse {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.v-bolt {
+  z-index: 4;
+  opacity: 0;
+  animation: bolt-flash var(--dur, 6s) steps(1) var(--delay, 0s) infinite;
+}
+
+.bolt-core {
+  fill: none;
+  stroke: #f5f1ff;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* A wide translucent stroke reads as glow without a blur filter. */
+.bolt-glow {
+  fill: none;
+  stroke: #a58bff;
+  stroke-opacity: 0.35;
+  stroke-width: 7;
+  stroke-linejoin: round;
+}
+
+@keyframes bolt-flash {
+  0%,
+  86% {
+    opacity: 0;
+  }
+  87% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0.15;
+  }
+  89% {
+    opacity: 0.95;
+  }
+  91%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Trace pulses reuse .streak from hero.css; shorter dashes for the traces. */
+.v-pulse .streak {
+  stroke-dasharray: 0.16 1.3;
+  stroke-dashoffset: 0.16;
+}
+
+.v-pulse .streak-glow {
+  stroke-width: 6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-cube {
+    animation: none;
+    translate: 0 calc(var(--lift) * 0.6);
+  }
+
+  .v-charge,
+  .v-bolt,
+  .v-pulse,
+  .v-column i {
+    display: none;
+  }
+}

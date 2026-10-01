@@ -1,8 +1,10 @@
 import { Play, Smartphone } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useSubscribe } from '@/api/queries'
+import { BrandMark } from '@/components/ui/BrandMark'
 import { ImageSlot } from '@/components/ui/ImageSlot'
 import { Reveal } from '@/components/ui/Reveal'
+import { CharReveal } from '@/components/ui/TextReveal'
 import { images } from '@/config/images'
 
 export function Cta() {
@@ -20,12 +22,13 @@ export function Cta() {
         <Reveal className="cta-panel edge-glow">
           <div className="ambient" aria-hidden />
           <div className="cta-copy">
-            <span className="badge">
-              <span className="badge-dot" aria-hidden />
-              Available on iOS and Android
+            <span className="chip-label">
+              <BrandMark /> Available on iOS and Android
             </span>
             <h2 id="cta-title" className="tone">
-              Your money, <strong>finally fluent in crypto</strong>
+              <CharReveal>
+                Your money, <strong>finally fluent in crypto</strong>
+              </CharReveal>
             </h2>
             <p className="lead">Open an account in minutes. Join 2.4 million people already using Nowcoin.</p>
 

@@ -3,7 +3,9 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useSubscribe } from '@/api/queries'
 import { SocialIcon } from '@/components/ui/SocialIcon'
-import { complianceBadges, footerColumns, site } from '@/config/site'
+import { ImageSlot } from '@/components/ui/ImageSlot'
+import { images } from '@/config/images'
+import { footerColumns, site } from '@/config/site'
 import { Logo } from './Logo'
 
 const YEAR = new Date().getFullYear()
@@ -22,7 +24,7 @@ export function Footer() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-brand">
-            <Logo />
+            <Logo withWordmark />
             <p>{site.description}</p>
             <form className="footer-newsletter" onSubmit={submit}>
               <label htmlFor="footer-email" className="sr-only">
@@ -64,8 +66,11 @@ export function Footer() {
 
         <div className="footer-mid">
           <ul className="footer-badges" aria-label="Certifications">
-            {complianceBadges.map((b) => (
-              <li key={b}>{b}</li>
+            {images.certifications.map((c) => (
+              <li key={c.src}>
+                <ImageSlot image={c} fit="contain" radius="6px" compact className="cert-icon" />
+                {c.alt}
+              </li>
             ))}
           </ul>
           <ul className="socials" aria-label="Social media">

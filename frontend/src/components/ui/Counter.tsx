@@ -1,29 +1,70 @@
 import { animate, useInView } from 'framer-motion'
 import { useEffect, useRef } from 'react'
-import type { Stat } from '@/api/types'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-/** Counts up from zero the first time it scrolls into view. */
-export function Counter({ value, prefix = '', suffix = '', decimals = 0 }: Omit<Stat, 'label'>) {
+interface Props {
+  value: number
+  /** Starting value for the first count (default 0). */
+  from?: number
+  prefix?: string
+  suffix?: string
+  decimals?: number
+  /** Thousands separators (default true). */
+  grouping?: boolean
+  /** Seconds to wait before counting. */
+  delay?: number
+  duration?: number
+}
+
+/**
+ * Counts up to `value` the first time it scrolls into view, then eases smoothly
+ * to any new value (live prices, calculator results).
+ */
+export function Counter({
+  value,
+  from = 0,
+  prefix = '',
+  suffix = '',
+  decimals = 0,
+  grouping = true,
+  delay = 0,
+  duration = 2.2,
+}: Props) {
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const inView = useInView(ref, { once: true, margin: '-40px' })
+  const shown = useRef<number | null>(null)
+  const reduced = useReducedMotion()
 
   useEffect(() => {
     const el = ref.current
     if (!el || !inView) return
-    const controls = animate(0, value, {
-      duration: 2.2,
+    const fmt = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+      useGrouping: grouping,
+    })
+    const write = (v: number) => {
+      shown.current = v
+      el.textContent = `${prefix}${fmt.format(v)}${suffix}`
+    }
+    if (reduced) {
+      write(value)
+      return
+    }
+    const first = shown.current === null
+    const controls = animate(shown.current ?? from, value, {
+      duration: first ? duration : 0.8,
+      delay: first ? delay : 0,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => {
-        el.textContent = `${prefix}${v.toFixed(decimals)}${suffix}`
-      },
+      onUpdate: write,
     })
     return () => controls.stop()
-  }, [inView, value, prefix, suffix, decimals])
+  }, [inView, value, from, prefix, suffix, decimals, grouping, delay, duration, reduced])
 
   return (
-    <span ref={ref}>
+    <span ref={ref} className="tabular">
       {prefix}
-      {(0).toFixed(decimals)}
+      {from.toFixed(decimals)}
       {suffix}
     </span>
   )

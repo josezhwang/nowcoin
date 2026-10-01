@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
 import { Footer } from '@/components/layout/Footer'
+import { HelpPill } from '@/components/layout/HelpPill'
 import { Nav } from '@/components/layout/Nav'
 import { ScrollManager } from '@/components/layout/ScrollManager'
 import { ScrollProgress } from '@/components/layout/ScrollProgress'
@@ -74,6 +75,7 @@ export default function App() {
           </ErrorBoundary>
         </main>
         <Footer />
+        <HelpPill />
       </BrowserRouter>
     </AppProviders>
   )

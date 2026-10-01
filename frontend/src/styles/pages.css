@@ -1,54 +1,10 @@
 /* ================= Page header ================= */
 
-.page-header {
-  padding-top: 8px;
-}
-
-.page-header-frame {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
-}
-
-.page-header-frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgb(var(--fg-rgb) / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--fg-rgb) / 0.04) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 60% 70% at 30% 30%, #000 10%, transparent 70%);
-}
-
-.page-header-inner {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 22px;
-  justify-items: start;
-  max-width: 880px;
-  padding: clamp(48px, 7vw, 96px) clamp(24px, 5vw, 72px) clamp(56px, 7vw, 104px);
-}
-
-.page-header h1 {
-  font-size: var(--fs-h1);
-  letter-spacing: -0.035em;
-}
-
-.page-header .lead {
-  max-width: 640px;
-}
-
 .header-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 40px;
+  justify-content: center;
+  gap: 48px;
   margin-top: 8px;
 }
 
@@ -66,6 +22,7 @@
 
 .crash {
   min-height: 70svh;
+  padding-top: 120px;
   display: grid;
   align-content: center;
   justify-items: start;
@@ -81,6 +38,7 @@
 .product-jump {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   margin-top: 8px;
 }

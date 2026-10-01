@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
+import { BrandMark } from './BrandMark'
 import { Reveal } from './Reveal'
+import { CharReveal } from './TextReveal'
 
 interface Props {
   eyebrow?: string
-  /** Use <em> for de-emphasised words and <strong> for the gradient accent. */
+  /** Use <em> for the muted part and <strong> for the violet accent. */
   title: ReactNode
   body?: ReactNode
   align?: 'left' | 'center'
@@ -15,20 +17,29 @@ interface Props {
 export function SectionHeading({ eyebrow, title, body, align = 'left', aside, id }: Props) {
   const cls = `section-head${align === 'center' ? ' center' : ''}${aside ? ' split' : ''}`
   return (
-    <Reveal className={cls}>
+    <div className={cls}>
       <div className="section-head-main">
         {eyebrow && (
-          <span className="badge">
-            <span className="badge-dot" aria-hidden />
-            {eyebrow}
-          </span>
+          <Reveal>
+            <span className="chip-label">
+              <BrandMark /> {eyebrow}
+            </span>
+          </Reveal>
         )}
         <h2 className="tone" id={id}>
-          {title}
+          <CharReveal>{title}</CharReveal>
         </h2>
-        {body && <p>{body}</p>}
+        {body && (
+          <Reveal delay={0.1}>
+            <p>{body}</p>
+          </Reveal>
+        )}
       </div>
-      {aside && <div className="section-aside">{aside}</div>}
-    </Reveal>
+      {aside && (
+        <Reveal delay={0.15} className="section-aside">
+          {aside}
+        </Reveal>
+      )}
+    </div>
   )
 }

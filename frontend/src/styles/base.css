@@ -47,9 +47,39 @@ h4 {
   font-family: var(--font-display);
   font-weight: 500;
   line-height: 1.08;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.035em;
   color: var(--text);
   text-wrap: balance;
+}
+
+/*
+ * Large headings are filled with a vertical gradient (bright → lavender grey).
+ * `--fill` is inherited, so <em>/<strong> and the per-character spans from
+ * <CharReveal> can each paint their own gradient.
+ */
+h1,
+h2 {
+  --fill: var(--heading-fill);
+}
+
+h1 em,
+h2 em {
+  font-style: normal;
+}
+
+h1,
+h2,
+.fill-text {
+  background: var(--fill);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+h1:has(.cr),
+h2:has(.cr) {
+  background: none;
+  color: var(--text);
 }
 
 p {
@@ -174,19 +204,28 @@ main:focus {
   }
 }
 
-/* Two-tone headings: <em> is the de-emphasised part, <strong> the accent. */
+/* Two-tone headings: <em> is the de-emphasised part, <strong> the violet accent. */
 .tone em {
+  --fill: var(--heading-muted);
   font-style: normal;
-  color: var(--faint);
 }
 
+.tone strong {
+  --fill: var(--text-gradient);
+  font-weight: inherit;
+}
+
+.tone em,
 .tone strong,
 .text-gradient {
-  font-weight: inherit;
-  background: var(--text-gradient);
+  background: var(--fill, var(--text-gradient));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.accent {
+  color: var(--accent-text);
 }
 
 .lead {
@@ -225,38 +264,58 @@ main:focus {
   transform: translateY(0);
 }
 
-/* ---------- Badge / eyebrow ---------- */
+/* ---------- Chips & badges ---------- */
 
+/* Small label chip: [mark] NOWCOIN */
+.chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 4px 10px 4px 6px;
+  border-radius: var(--radius-pill);
+  background: rgb(var(--fg-rgb) / 0.1);
+  color: var(--text-secondary);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chip-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Two-part badge: a filled tag followed by an icon + text, inside an outlined pill. */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   width: fit-content;
-  padding: 6px 12px 6px 8px;
+  padding: 3px 12px 3px 3px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-strong);
-  background: var(--surface);
+  background: rgb(var(--fg-rgb) / 0.02);
   color: var(--text-secondary);
   font-size: var(--fs-xs);
   font-weight: 500;
-  letter-spacing: 0.01em;
+  box-shadow: inset 0 1px 0 rgb(var(--fg-rgb) / 0.05);
 }
 
-.badge-dot {
-  width: 6px;
-  height: 6px;
-  margin-left: 4px;
-  border-radius: 50%;
-  background: var(--brand);
-  box-shadow: 0 0 0 4px var(--brand-soft);
+.badge svg {
+  flex: none;
 }
 
 .badge-tag {
-  padding: 2px 8px;
+  padding: 3px 12px;
   border-radius: var(--radius-pill);
-  background: var(--brand-gradient);
-  color: #fff;
+  background: rgb(var(--fg-rgb) / 0.14);
+  color: var(--text);
+  font-size: 0.62rem;
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* ---------- Buttons ---------- */
@@ -266,11 +325,11 @@ main:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 48px;
-  padding: 0 22px;
+  height: 46px;
+  padding: 0 20px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
   transition:
@@ -290,23 +349,26 @@ main:focus {
   cursor: not-allowed;
 }
 
+/* Violet glass, lit from the top edge. */
 .btn-primary {
-  background: var(--brand-gradient);
+  background: var(--glass-brand);
+  border-color: rgb(255 255 255 / 0.14);
   color: #fff;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.2),
-    0 10px 30px -12px rgb(109 93 252 / 0.8);
+    0 12px 32px -14px rgb(124 92 255 / 0.85);
 }
 
 .btn-primary:hover {
+  background: var(--glass-brand-hover);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.25),
-    0 14px 36px -12px rgb(109 93 252 / 0.95);
+    inset 0 1px 0 rgb(255 255 255 / 0.26),
+    0 16px 40px -14px rgb(124 92 255 / 1);
 }
 
 .btn-secondary {
-  background: var(--surface);
-  border-color: var(--border-strong);
+  background: rgb(var(--fg-rgb) / 0.02);
+  border-color: rgb(var(--fg-rgb) / 0.16);
   color: var(--text);
 }
 
@@ -334,15 +396,15 @@ main:focus {
 }
 
 .btn-sm {
-  height: 40px;
+  height: 38px;
   padding: 0 16px;
   font-size: var(--fs-sm);
 }
 
 .btn-lg {
-  height: 54px;
-  padding: 0 28px;
-  font-size: 1rem;
+  height: 52px;
+  padding: 0 24px;
+  font-size: 0.95rem;
 }
 
 .btn svg {
@@ -381,11 +443,17 @@ main:focus {
   position: relative;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--surface);
+  background: var(--panel);
   transition:
     border-color 0.25s,
     background 0.25s,
     transform 0.3s var(--ease);
+}
+
+.corner-dots {
+  background:
+    radial-gradient(circle at 12px 12px, rgb(var(--fg-rgb) / 0.4) 1.2px, transparent 1.8px),
+    radial-gradient(circle at calc(100% - 12px) 12px, rgb(var(--fg-rgb) / 0.4) 1.2px, transparent 1.8px), var(--panel);
 }
 
 .card-hover:hover {
@@ -567,4 +635,15 @@ main:focus {
   right: -10%;
   bottom: -35%;
   background: radial-gradient(closest-side, var(--ambient-2), var(--ambient-3) 60%, transparent);
+}
+
+/* Row of buttons (page headers, callouts). */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-header .hero-actions {
+  justify-content: center;
 }

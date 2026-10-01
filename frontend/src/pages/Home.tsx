@@ -1,19 +1,20 @@
 import { useHomeContent } from '@/api/queries'
 import { PageMeta } from '@/components/layout/PageMeta'
+import { Bento } from '@/sections/Bento'
 import { CardSection } from '@/sections/CardSection'
 import { Cta } from '@/sections/Cta'
-import { Developers } from '@/sections/Developers'
 import { Faq } from '@/sections/Faq'
-import { Features } from '@/sections/Features'
+import { FeatureDome } from '@/sections/FeatureDome'
+import { Gallery } from '@/sections/Gallery'
+import { Gateway } from '@/sections/Gateway'
 import { Global } from '@/sections/Global'
 import { Hero } from '@/sections/Hero'
+import { Highlights } from '@/sections/Highlights'
 import { LogoCloud } from '@/sections/LogoCloud'
-import { Security } from '@/sections/Security'
 import { Showcase } from '@/sections/Showcase'
 import { Steps } from '@/sections/Steps'
 import { TeamPreview } from '@/sections/TeamPreview'
 import { Testimonials } from '@/sections/Testimonials'
-import { TickerBar } from '@/sections/TickerBar'
 
 export default function Home() {
   const { data } = useHomeContent()
@@ -22,15 +23,16 @@ export default function Home() {
     <>
       <PageMeta />
       <Hero />
-      <TickerBar />
       <LogoCloud />
-      <Features />
-      <Showcase />
-      <CardSection />
-      <Global />
+      <Highlights />
+      <Gateway />
+      <Bento />
+      <FeatureDome />
       {data && <Steps steps={data.steps} />}
-      <Security />
-      <Developers />
+      <Showcase />
+      <Global />
+      <CardSection />
+      <Gallery />
       <TeamPreview />
       {data && <Testimonials items={data.testimonials} />}
       {data && <Faq faqs={data.faqs} />}
