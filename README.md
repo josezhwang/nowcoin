@@ -19,7 +19,9 @@ npm run dev     # API on http://localhost:4000 + website on http://localhost:517
 ### Share it with someone
 
 `npm run share` builds both apps and serves the site on port **5174**, reachable from other devices (the API stays
-private behind it, so there is no CORS to configure — leave `VITE_API_URL` unset).
+private behind it, so there is no CORS to configure — leave `VITE_API_URL` unset). Any address or host name works:
+an IP, a tunnel (Cloudflare, ngrok, Tailscale) or a dynamic-DNS name. Use `npm run share`, not `npm run dev` — the dev
+server only listens on this computer.
 
 - **Same Wi-Fi/LAN:** open `http://<your-computer's-IP>:5174` (Windows: `ipconfig` → IPv4 Address). Allow Node.js
   through the firewall when asked.
@@ -37,14 +39,14 @@ as CI runs). Each app also works on its own — see `frontend/README.md` and `ba
 
 Configuration lives in `backend/.env` and `frontend/.env` — copy the `.env.example` files. All variables are optional:
 
-| Where    | Variable       | Default                 | Purpose                                                  |
-| -------- | -------------- | ----------------------- | -------------------------------------------------------- |
-| backend  | `PORT`         | `4000`                  | API port                                                 |
-| backend  | `HOST`         | `127.0.0.1`             | Interface the API binds to (private behind `/api` proxy) |
-| backend  | `CORS_ORIGIN`  | `http://localhost:5173` | Comma-separated allowed origins                          |
-| backend  | `LEADS_DIR`    | `backend/data`          | Where contact/newsletter JSONL goes                      |
-| frontend | `VITE_API_URL` | `/api`                  | API base for production builds on a different origin     |
-| frontend | `API_URL`      | `http://127.0.0.1:4000` | Dev/preview proxy target for `/api`                      |
+| Where    | Variable       | Default                    | Purpose                                                  |
+| -------- | -------------- | -------------------------- | -------------------------------------------------------- |
+| backend  | `PORT`         | `4000`                     | API port                                                 |
+| backend  | `HOST`         | `127.0.0.1`                | Interface the API binds to (private behind `/api` proxy) |
+| backend  | `CORS_ORIGIN`  | `localhost:5173,5174,5180` | Comma-separated allowed origins, or `*` for any          |
+| backend  | `LEADS_DIR`    | `backend/data`             | Where contact/newsletter JSONL goes                      |
+| frontend | `VITE_API_URL` | `/api`                     | API base for production builds on a different origin     |
+| frontend | `API_URL`      | `http://127.0.0.1:4000`    | Dev/preview proxy target for `/api`                      |
 
 ## API
 

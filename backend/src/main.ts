@@ -12,10 +12,16 @@ try {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+  // Only needed when the frontend calls the API directly (VITE_API_URL); through the
+  // /api proxy requests are same-origin. CORS_ORIGIN=* allows every origin.
+  const corsOrigin =
+    process.env.CORS_ORIGIN ??
+    'http://localhost:5173,http://localhost:5174,http://localhost:5180';
   app.enableCors({
-    origin: (
-      process.env.CORS_ORIGIN ?? 'http://localhost:5173,http://localhost:5180'
-    ).split(','),
+    origin:
+      corsOrigin.trim() === '*'
+        ? true
+        : corsOrigin.split(',').map((origin) => origin.trim()),
   });
   app.useGlobalPipes(
     new ValidationPipe({

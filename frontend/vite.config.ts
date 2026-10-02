@@ -14,10 +14,12 @@ export default defineConfig({
     },
   },
   preview: {
-    // `npm run share` serves the build with `vite preview`. Vite rejects unknown host
-    // names (IP addresses are always fine); this admits a Cloudflare quick tunnel
-    // (`cloudflared tunnel --url http://localhost:5174`) for sharing from a home PC.
-    allowedHosts: ['.trycloudflare.com'],
+    // `npm run share` serves the build with `vite preview`. Vite otherwise answers any
+    // host name other than an IP/localhost with 403 "Blocked request" (easily mistaken
+    // for a CORS error), which breaks tunnels (Cloudflare, ngrok, Tailscale) and dynamic
+    // DNS names. Preview only serves the public build, so any host is fine; the dev
+    // server keeps Vite's strict check.
+    allowedHosts: true,
   },
   build: {
     rollupOptions: {
