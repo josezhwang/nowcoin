@@ -254,9 +254,13 @@
 
 .help-pill-wrap {
   position: fixed;
-  right: 20px;
+  right: 16px;
   bottom: 20px;
   z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
 }
 
 .help-pill {
@@ -289,10 +293,221 @@
   color: #fff;
 }
 
+/* ---------- Help chat ---------- */
+
+.chat-panel-wrap {
+  transform-origin: bottom right;
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 32px));
+  height: min(560px, calc(100dvh - 110px));
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--popover-bg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-head div {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-head strong {
+  font-size: var(--fs-sm);
+}
+
+.chat-head span:not(.help-avatar) {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.chat-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+}
+
+.chat-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.chat-log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.chat-msg {
+  max-width: 85%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat-msg-assistant {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 6px;
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+.chat-msg-assistant a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.chat-msg-user {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--brand-gradient);
+  color: #fff;
+}
+
+.chat-typing {
+  display: flex;
+  gap: 5px;
+  padding: 14px 16px;
+}
+
+.chat-typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: chat-dot 1.2s infinite ease-in-out;
+}
+
+.chat-typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat-typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes chat-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chat-suggestions button {
+  padding: 7px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+}
+
+.chat-suggestions button:hover {
+  border-color: var(--brand);
+  color: var(--text);
+}
+
+.chat-error {
+  margin: 0;
+  color: var(--down);
+  font-size: var(--fs-xs);
+}
+
+.chat-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.chat-form textarea {
+  flex: 1;
+  max-height: 120px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  resize: none;
+  field-sizing: content;
+}
+
+.chat-form textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-soft);
+}
+
+.chat-form textarea::placeholder {
+  color: var(--faint);
+}
+
+.chat-form button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #fff;
+}
+
+.chat-form button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gallery-track,
   .steps-rail i,
-  .hl-float {
+  .hl-float,
+  .chat-typing i {
     animation: none;
   }
 }

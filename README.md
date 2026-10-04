@@ -39,31 +39,46 @@ as CI runs). Each app also works on its own — see `frontend/README.md` and `ba
 
 Configuration lives in `backend/.env` and `frontend/.env` — copy the `.env.example` files. All variables are optional:
 
-| Where    | Variable       | Default                    | Purpose                                                  |
-| -------- | -------------- | -------------------------- | -------------------------------------------------------- |
-| backend  | `PORT`         | `4000`                     | API port                                                 |
-| backend  | `HOST`         | `127.0.0.1`                | Interface the API binds to (private behind `/api` proxy) |
-| backend  | `CORS_ORIGIN`  | `localhost:5173,5174,5180` | Comma-separated allowed origins, or `*` for any          |
-| backend  | `LEADS_DIR`    | `backend/data`             | Where contact/newsletter JSONL goes                      |
-| frontend | `VITE_API_URL` | `/api`                     | API base for production builds on a different origin     |
-| frontend | `API_URL`      | `http://127.0.0.1:4000`    | Dev/preview proxy target for `/api`                      |
+| Where    | Variable            | Default                    | Purpose                                                  |
+| -------- | ------------------- | -------------------------- | -------------------------------------------------------- |
+| backend  | `PORT`              | `4000`                     | API port                                                 |
+| backend  | `HOST`              | `127.0.0.1`                | Interface the API binds to (private behind `/api` proxy) |
+| backend  | `CORS_ORIGIN`       | `localhost:5173,5174,5180` | Comma-separated allowed origins, or `*` for any          |
+| backend  | `LEADS_DIR`         | `backend/data`             | Where contact/newsletter JSONL goes                      |
+| backend  | `ANTHROPIC_API_KEY` | _(unset)_                  | Lets Claude answer the help chat (see below)             |
+| frontend | `VITE_API_URL`      | `/api`                     | API base for production builds on a different origin     |
+| frontend | `API_URL`           | `http://127.0.0.1:4000`    | Dev/preview proxy target for `/api`                      |
 
 ## API
 
-| Method | Path                  | Notes                                                                |
-| ------ | --------------------- | -------------------------------------------------------------------- |
-| GET    | `/api/products`       | All products                                                         |
-| GET    | `/api/products/:slug` | One product (404 if unknown)                                         |
-| GET    | `/api/cards`          | Card tiers                                                           |
-| GET    | `/api/home`           | Stats, steps, FAQs, testimonials                                     |
-| GET    | `/api/team`           | Team members (portraits come from `/images/team/<slug>.jpg`)         |
-| GET    | `/api/market/tickers` | CoinGecko prices, cached 60 s; falls back to indicative data offline |
-| POST   | `/api/newsletter`     | `{ email }`                                                          |
-| POST   | `/api/contact`        | `{ name, email, company?, topic, message }`                          |
-| GET    | `/api/health`         | Liveness                                                             |
+| Method | Path                  | Notes                                                                 |
+| ------ | --------------------- | --------------------------------------------------------------------- |
+| GET    | `/api/products`       | All products                                                          |
+| GET    | `/api/products/:slug` | One product (404 if unknown)                                          |
+| GET    | `/api/cards`          | Card tiers                                                            |
+| GET    | `/api/home`           | Stats, steps, FAQs, testimonials                                      |
+| GET    | `/api/team`           | Team members (portraits come from `/images/team/<slug>.jpg`)          |
+| GET    | `/api/market/tickers` | CoinGecko prices, cached 60 s; falls back to indicative data offline  |
+| POST   | `/api/newsletter`     | `{ email }`                                                           |
+| POST   | `/api/contact`        | `{ name, email, company?, topic, message }`                           |
+| POST   | `/api/chat`           | `{ messages: [{ role, content }] }` → `{ reply, source }` (help chat) |
+| GET    | `/api/health`         | Liveness                                                              |
 
-POST routes are validated with `class-validator` and rate-limited to 5/min per IP.
+POST routes are validated with `class-validator` and rate-limited per IP (5/min for leads, 20/min for chat).
 Leads are appended to JSONL files — swap `LeadsService` for a database or CRM before launch.
+
+## Help chat
+
+The "Need help?" button opens a chat that answers questions about the company. Its knowledge is built from the
+site content in `backend/src/content/content.data.ts`, so editing that file updates the bot too.
+
+- **With Claude:** put an API key from [platform.claude.com](https://platform.claude.com/settings/keys) in
+  `backend/.env` as `ANTHROPIC_API_KEY=...` and restart. Claude Opus 5.5 answers any wording, follows up on earlier
+  questions and replies in the visitor's language. It only answers from the site content, and points to `/contact`
+  for anything else or for account problems. Each question is a paid API call; the company knowledge is prompt-cached
+  to keep that cheap.
+- **Without a key** (or if Claude is unreachable), the chat answers from built-in keyword matching over the FAQs,
+  products, card tiers and team. It handles common questions but not unusual wording.
 
 ## Where things live
 

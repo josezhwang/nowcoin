@@ -1,6 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { api } from './client'
-import type { CardTier, ContactPayload, HomeContent, Product, TeamMember, TickerResponse } from './types'
+import type {
+  CardTier,
+  ChatMessage,
+  ChatReply,
+  ContactPayload,
+  HomeContent,
+  Product,
+  TeamMember,
+  TickerResponse,
+} from './types'
 
 export const queryKeys = {
   products: ['products'] as const,
@@ -50,3 +59,6 @@ export const useSubscribe = () =>
 
 export const useContact = () =>
   useMutation({ mutationFn: (payload: ContactPayload) => api.post<{ ok: true }>('/contact', payload) })
+
+export const useChat = () =>
+  useMutation({ mutationFn: (messages: ChatMessage[]) => api.post<ChatReply>('/chat', { messages }) })

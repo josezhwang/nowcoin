@@ -426,3 +426,47 @@ export const TEAM: TeamMember[] = [
     links: { linkedin: '#' },
   },
 ];
+
+// About-the-company facts for the help chat. The Company page renders its own copy
+// (frontend/src/pages/CompanyPage.tsx) — keep the two in sync.
+export const COMPANY = {
+  mission: 'Make crypto usable for the next billion people.',
+  values: [
+    'Customers own their money: clear custody choices and no hidden rehypothecation, ever.',
+    "Security is the product: we'd rather ship later than ship something we can't defend.",
+    'Radically transparent: reserves, fees and incidents are published openly.',
+    'Make it feel simple: we absorb the complexity of crypto so customers never have to.',
+  ],
+  timeline: [
+    {
+      year: '2019',
+      text: 'Founded with one mission: make crypto usable for the next billion people.',
+    },
+    {
+      year: '2020',
+      text: 'Launched Nowcoin Wallet with MPC key protection and no seed phrases.',
+    },
+    {
+      year: '2021',
+      text: 'Nowcoin Exchange goes live with 100+ trading pairs.',
+    },
+    {
+      year: '2022',
+      text: 'First Nowcoin Cards shipped; one million customers reached.',
+    },
+    {
+      year: '2024',
+      text: 'Nowcoin Pay and Nowcoin Vault launched for businesses and institutions.',
+    },
+    {
+      year: '2026',
+      text: 'Nowcoin Connect API opens our infrastructure to every developer.',
+    },
+  ],
+  openings: [
+    'Senior Rust Engineer, Matching Engine (Engineering, Remote)',
+    'Staff Security Engineer, MPC (Security, Hybrid)',
+    'Product Designer, Card (Design, Remote)',
+    'Compliance Lead (Legal, Hybrid)',
+  ],
+};

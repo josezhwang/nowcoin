@@ -70,3 +70,14 @@ export interface TeamMember {
   bio: string
   links: { linkedin?: string; x?: string; github?: string }
 }
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface ChatReply {
+  reply: string
+  /** `ai` when Claude answered, `faq` when the backend's keyword fallback did. */
+  source: 'ai' | 'faq'
+}

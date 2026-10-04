@@ -8,6 +8,8 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { images } from '@/config/images'
 
 // Placeholder company story — replace with real milestones and roles.
+// The help chat's knowledge mirrors VALUES, TIMELINE and OPENINGS (COMPANY in
+// backend/src/content/content.data.ts) — keep the two in sync.
 const VALUES = [
   {
     icon: HeartHandshake,

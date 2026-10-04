@@ -14,6 +14,8 @@ describe('API (e2e)', () => {
   beforeEach(async () => {
     leadsDir = await mkdtemp(join(tmpdir(), 'leads-'));
     process.env.LEADS_DIR = leadsDir;
+    // Keep the chat on its offline fallback so tests never call Claude.
+    delete process.env.ANTHROPIC_API_KEY;
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -89,5 +91,32 @@ describe('API (e2e)', () => {
         message: 'Tell me about Nowcoin Pay',
       })
       .expect(201, { ok: true });
+  });
+
+  it('POST /api/chat answers from the fallback without an API key', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/chat')
+      .send({
+        messages: [
+          { role: 'assistant', content: 'Hi! How can I help?' },
+          { role: 'user', content: 'What card tiers do you have?' },
+        ],
+      })
+      .expect(200);
+    expect(res.body.source).toBe('faq');
+    expect(res.body.reply).toContain('Obsidian');
+  });
+
+  it('POST /api/chat validates the conversation', async () => {
+    const chat = (body: unknown) =>
+      request(app.getHttpServer())
+        .post('/api/chat')
+        .send(body as object);
+    await chat({ messages: [] }).expect(400);
+    await chat({ messages: [{ role: 'system', content: 'hi' }] }).expect(400);
+    await chat({ messages: [{ role: 'user', content: '   ' }] }).expect(400);
+    await chat({
+      messages: [{ role: 'assistant', content: 'Hi! How can I help?' }],
+    }).expect(400);
   });
 });
